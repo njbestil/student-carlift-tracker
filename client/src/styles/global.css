@@ -1,0 +1,123 @@
+:root {
+  color: #162013;
+  background: #f7f9f4;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-block-size: 100vh;
+  margin: 0;
+}
+
+a {
+  color: #075985;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: 0;
+  border-radius: 0.375rem;
+  background: #17633a;
+  color: #ffffff;
+  padding: 0.7rem 1rem;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+main:focus-visible {
+  outline: 0.2rem solid #0f766e;
+  outline-offset: 0.2rem;
+}
+
+.skip-link {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 1rem;
+  transform: translateY(-120%);
+  background: #ffffff;
+  color: #162013;
+  padding: 0.5rem 0.75rem;
+  z-index: 10;
+}
+
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+.site-header {
+  border-block-end: 1px solid #d6ded0;
+  background: #ffffff;
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  inline-size: min(70rem, calc(100% - 2rem));
+  margin-inline: auto;
+  padding-block: 1rem;
+}
+
+.brand {
+  font-weight: 700;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.page-shell {
+  inline-size: min(70rem, calc(100% - 2rem));
+  margin-inline: auto;
+  padding-block: 2rem;
+}
+
+.auth-panel,
+.content-panel {
+  max-inline-size: 36rem;
+}
+
+form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+label {
+  font-weight: 600;
+}
+
+input,
+textarea {
+  inline-size: 100%;
+  border: 1px solid #9aa993;
+  border-radius: 0.375rem;
+  padding: 0.65rem 0.75rem;
+}
+
+.form-error {
+  min-block-size: 1.5rem;
+  color: #991b1b;
+}
+
+.form-status {
+  min-block-size: 1.5rem;
+  color: #17633a;
+}
