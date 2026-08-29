@@ -2,13 +2,23 @@ import { apiClient } from '../../services/api/apiClient';
 
 export type DriverProfilePayload = {
   fullName: string;
+  address: string;
+  vehicleType: string;
+  vehiclePlateNumber: string;
   profilePhotoUrl?: string;
+  latitude?: number;
+  longitude?: number;
 };
 
 export type DriverProfile = DriverProfilePayload & {
   id: string;
   userId: string;
   profilePhotoUrl: string | null;
+  address: string | null;
+  vehicleType: string | null;
+  vehiclePlateNumber: string | null;
+  latitude: number | null;
+  longitude: number | null;
   isOnService: boolean;
 };
 

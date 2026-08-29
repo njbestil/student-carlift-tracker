@@ -14,6 +14,8 @@ export type DriverProfile = {
   address: string | null;
   vehicleType: string | null;
   vehiclePlateNumber: string | null;
+  latitude: number | null;
+  longitude: number | null;
   isOnService: boolean;
 };
 
@@ -52,6 +54,8 @@ type DriverProfileRow = {
   address: string | null;
   vehicle_type: string | null;
   vehicle_plate_number: string | null;
+  latitude: string | null;
+  longitude: string | null;
   is_on_service: boolean;
 };
 
@@ -84,6 +88,8 @@ const mapDriverProfile = (row: DriverProfileRow): DriverProfile => ({
   address: row.address,
   vehicleType: row.vehicle_type,
   vehiclePlateNumber: row.vehicle_plate_number,
+  latitude: row.latitude === null ? null : Number(row.latitude),
+  longitude: row.longitude === null ? null : Number(row.longitude),
   isOnService: row.is_on_service,
 });
 
@@ -111,7 +117,7 @@ const mapDriverTrip = (row: DriverTripRow): DriverTrip => ({
 export const driversRepository = {
   async findByUserId(userId: string): Promise<DriverProfile | null> {
     const result = await pool.query<DriverProfileRow>(
-      `SELECT id, user_id, full_name, profile_photo_url, address, vehicle_type, vehicle_plate_number, is_on_service
+      `SELECT id, user_id, full_name, profile_photo_url, address, vehicle_type, vehicle_plate_number, latitude, longitude, is_on_service
        FROM driver_profiles
        WHERE user_id = $1`,
       [userId],
@@ -377,9 +383,9 @@ export const driversRepository = {
   async upsert(userId: string, input: UpsertDriverProfileInput): Promise<DriverProfile> {
     const result = await pool.query<DriverProfileRow>(
       `INSERT INTO driver_profiles (
-         user_id, full_name, profile_photo_url, address, vehicle_type, vehicle_plate_number
+         user_id, full_name, profile_photo_url, address, vehicle_type, vehicle_plate_number, latitude, longitude
        )
-       VALUES ($1, $2, NULLIF($3, ''), NULLIF($4, ''), NULLIF($5, ''), NULLIF($6, ''))
+       VALUES ($1, $2, NULLIF($3, ''), NULLIF($4, ''), NULLIF($5, ''), NULLIF($6, ''), $7, $8)
        ON CONFLICT (user_id) DO UPDATE
        SET full_name = EXCLUDED.full_name,
            profile_photo_url = EXCLUDED.profile_photo_url,
@@ -395,8 +401,10 @@ export const driversRepository = {
              WHEN $6::text IS NULL THEN driver_profiles.vehicle_plate_number
              ELSE NULLIF($6, '')
            END,
+           latitude = CASE WHEN $7::numeric IS NULL THEN driver_profiles.latitude ELSE EXCLUDED.latitude END,
+           longitude = CASE WHEN $8::numeric IS NULL THEN driver_profiles.longitude ELSE EXCLUDED.longitude END,
            updated_at = now()
-       RETURNING id, user_id, full_name, profile_photo_url, address, vehicle_type, vehicle_plate_number, is_on_service`,
+       RETURNING id, user_id, full_name, profile_photo_url, address, vehicle_type, vehicle_plate_number, latitude, longitude, is_on_service`,
       [
         userId,
         input.fullName,
@@ -404,6 +412,8 @@ export const driversRepository = {
         input.address,
         input.vehicleType,
         input.vehiclePlateNumber,
+        input.latitude ?? null,
+        input.longitude ?? null,
       ],
     );
 
@@ -423,7 +433,7 @@ export const driversRepository = {
        SET is_on_service = $2,
            updated_at = now()
        WHERE user_id = $1
-       RETURNING id, user_id, full_name, profile_photo_url, address, vehicle_type, vehicle_plate_number, is_on_service`,
+       RETURNING id, user_id, full_name, profile_photo_url, address, vehicle_type, vehicle_plate_number, latitude, longitude, is_on_service`,
       [userId, input.isOnService],
     );
 
