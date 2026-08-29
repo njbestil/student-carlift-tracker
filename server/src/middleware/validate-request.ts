@@ -14,3 +14,16 @@ export const validateBody =
     request.body = result.data;
     return next();
   };
+
+export const validateParams =
+  <TSchema>(schema: ZodType<TSchema>) =>
+  (request: Request, _response: Response, next: NextFunction) => {
+    const result = schema.safeParse(request.params);
+
+    if (!result.success) {
+      return next(new AppError('Request validation failed', 400, result.error.flatten().fieldErrors));
+    }
+
+    request.params = result.data as Request['params'];
+    return next();
+  };

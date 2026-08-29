@@ -37,6 +37,8 @@ For any frontend task:
 Work as a senior engineer while maintaining the project-manager responsibility above.
 
 - Read the relevant existing files before editing.
+- Treat anything related to frontend implementation, frontend investigation, UI, UX, client-side routing, browser behavior, client state, client tests, or client build configuration as belonging in the `client/` folder.
+- Treat anything related to backend implementation, APIs, authentication, server-side validation, repositories, database access, migrations, server tests, or server build configuration as belonging in the `server/` folder.
 - Prefer existing project conventions over new abstractions.
 - Keep changes small, focused, and reviewable.
 - Avoid unrelated refactors.

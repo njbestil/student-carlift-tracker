@@ -13,4 +13,9 @@ vehicleLocationsRouter.post(
   validateBody(createVehicleLocationSchema),
   asyncHandler(vehicleLocationsController.create),
 );
+vehicleLocationsRouter.get(
+  '/my-driver/latest',
+  authenticate,
+  asyncHandler(vehicleLocationsController.latestForAssignedDriver),
+);
 vehicleLocationsRouter.get('/latest/:driverId', authenticate, asyncHandler(vehicleLocationsController.latest));

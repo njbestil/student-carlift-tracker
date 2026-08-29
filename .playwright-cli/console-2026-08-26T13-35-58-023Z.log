@@ -1,0 +1,48 @@
+[     297ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=32c1d2ca:20100
+[     811ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/favicon.ico:0
+[ 6585713ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:864
+[ 9823172ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=32c1d2ca:20100
+[10570004ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/styles/global.css?t=1787761927998:0
+[10570004ms] [ERROR] [vite] Failed to reload /src/styles/global.css. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:808
+[17578294ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:864
+[55596135ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=32c1d2ca:20100
+[56198203ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:864
+[79116027ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ http://localhost:5173/src/features/drivers/DriverDashboardPage.tsx?t=1787749973767:0
+[79116034ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ http://localhost:5173/src/features/drivers/DriverProfilePage.tsx?t=1787751275557:0
+[79116035ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ http://localhost:5173/src/features/drivers/DriverProfileSetupPage.tsx?t=1787751275540:0
+[79116035ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ http://localhost:5173/src/features/students/StudentDashboardPage.tsx?t=1787765707563:0
+[79116035ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ http://localhost:5173/src/features/students/StudentProfilePage.tsx?t=1787753539191:0
+[79116035ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ http://localhost:5173/src/features/students/StudentProfileSetupPage.tsx?t=1787753550947:0
+[79116035ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ http://localhost:5173/src/routes/RouteGuards.tsx:0
+[81528334ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:864
+[97774128ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=32c1d2ca:20100
+[98805211ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:864
+[101983284ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=32c1d2ca:20100
+[108582203ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:864
+[108776124ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=32c1d2ca:20100
+[109784111ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:864
+[147448741ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=32c1d2ca:20100
+[150630342ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=32c1d2ca:20100
+[150656757ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=35b4e132:20102
+[151183208ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/features/students/StudentDashboardPage.tsx?t=1787902541199:0
+[151183210ms] [ERROR] [vite] Failed to reload /src/features/students/StudentDashboardPage.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:808
+[151204108ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:5173/src/features/students/StudentDashboardPage.tsx?t=1787902562049:0
+[151204111ms] [ERROR] [vite] Failed to reload /src/features/students/StudentDashboardPage.tsx. This could be due to syntax errors or importing non-existent modules. (see errors above) @ http://localhost:5173/@vite/client:808
+[154247505ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=35b4e132:20102
+[154270774ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=35b4e132:20102
+[157221288ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:864
+[158844296ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=35b4e132:20102
+[160914775ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:864
+[160915874ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=35b4e132:20102
+[160931092ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:864
+[160947198ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=35b4e132:20102
+[161995515ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=35b4e132:20102
+[165540472ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:864
+[166491099ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ http://localhost:5173/src/features/students/StudentProfilePage.tsx:0
+[166491167ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ http://localhost:5173/src/features/students/StudentProfileSetupPage.tsx:0
+[166491167ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ http://localhost:5173/src/routes/RouteGuards.tsx:0
+[166491167ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ http://localhost:5173/@fs/D:/Developer/student-carlift-tracker/node_modules/vite/dist/client/env.mjs:0
+[166491170ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ http://localhost:5173/src/app/providers/useAuth.ts:0
+[166491170ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ http://localhost:5173/src/services/api/apiError.ts:0
+[166491170ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ http://localhost:5173/src/features/users/users.api.ts:0
+[166491170ms] [ERROR] Failed to load resource: net::ERR_NETWORK_CHANGED @ http://localhost:5173/src/features/drivers/drivers.api.ts:0

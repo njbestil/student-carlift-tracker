@@ -1,10 +1,11 @@
 import { z } from 'zod';
+import { uaeMobileNumberMessage, uaeMobileNumberPattern } from '../../utils/uae-mobile-number.js';
 
 export const updateUserSchema = z.object({
   mobileNumber: z
     .string()
     .trim()
-    .regex(/^0[0-9]{9}$/, 'Mobile number must use a 10-digit local format')
+    .regex(uaeMobileNumberPattern, uaeMobileNumberMessage)
     .optional(),
 });
 

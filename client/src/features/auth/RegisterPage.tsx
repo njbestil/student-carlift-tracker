@@ -1,8 +1,11 @@
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../app/providers/useAuth';
+import { AuthScaffold } from '../../components/ui/AuthScaffold';
+import { ToastNotification } from '../../components/ui/ToastNotification';
 import { ApiError } from '../../services/api/apiError';
 import { authApi } from './auth.api';
+import { normalizeUaeMobileNumber, uaeMobileNumberPattern } from '../../utils/uaeMobileNumber';
 
 export const RegisterPage = () => {
   const navigate = useNavigate();
@@ -12,7 +15,6 @@ export const RegisterPage = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError('');
-
     const formData = new FormData(event.currentTarget);
 
     try {
@@ -30,34 +32,70 @@ export const RegisterPage = () => {
   };
 
   return (
-    <section className="auth-panel" aria-labelledby="register-heading">
-      <h1 id="register-heading">Create your account</h1>
-      <p>Register with your mobile number only. Profile details are collected after login.</p>
-      <p className="form-error" role="alert">
-        {error}
-      </p>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="mobileNumber">Mobile number</label>
-        <input id="mobileNumber" name="mobileNumber" autoComplete="tel" required placeholder="0501234567" />
-
-        <label htmlFor="password">Password</label>
-        <input id="password" name="password" type="password" autoComplete="new-password" required minLength={8} />
-
-        <label htmlFor="confirmPassword">Confirm password</label>
-        <input
-          id="confirmPassword"
-          name="confirmPassword"
-          type="password"
-          autoComplete="new-password"
-          required
-          minLength={8}
-        />
-
-        <button type="submit">Create account</button>
+    <AuthScaffold
+      headingId="register-heading"
+      title="Join the ride!"
+      subtitle="Create a parent account, then tell us about your student."
+    >
+      <ToastNotification message={error} variant="error" onClose={() => setError('')} />
+      <form className="form-stack" onSubmit={handleSubmit}>
+        <div>
+          <label className="ui-label" htmlFor="mobileNumber">
+            Mobile Number
+          </label>
+          <input
+            className="ui-field"
+            id="mobileNumber"
+            name="mobileNumber"
+            autoComplete="tel"
+            inputMode="tel"
+            pattern={uaeMobileNumberPattern}
+            maxLength={10}
+            onChange={(event) => {
+              event.currentTarget.value = normalizeUaeMobileNumber(event.currentTarget.value);
+            }}
+            required
+            placeholder="0501234567"
+          />
+        </div>
+        <div>
+          <label className="ui-label" htmlFor="password">
+            Password
+          </label>
+          <input
+            className="ui-field"
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="new-password"
+            required
+            minLength={8}
+          />
+        </div>
+        <div>
+          <label className="ui-label" htmlFor="confirmPassword">
+            Confirm Password
+          </label>
+          <input
+            className="ui-field"
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            required
+            minLength={8}
+          />
+        </div>
+        <button className="ui-button-success" type="submit">
+          Create Account
+        </button>
       </form>
-      <p>
-        Already registered? <Link to="/login">Sign in</Link>
+      <p className="mt-7 text-center text-sm text-muted">
+        Already registered?{' '}
+        <Link className="font-extrabold text-sky-dark" to="/login">
+          Log In
+        </Link>
       </p>
-    </section>
+    </AuthScaffold>
   );
 };

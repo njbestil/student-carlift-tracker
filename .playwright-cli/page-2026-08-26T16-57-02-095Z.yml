@@ -1,0 +1,25 @@
+- generic [ref=e2]:
+  - link "Skip to main content" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - main [active] [ref=e6]:
+    - region [ref=e7]:
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - heading "Welcome back!" [level=1] [ref=e25]
+          - paragraph [ref=e29]: Let's get your little one safely on the way.
+        - alert [ref=e30]
+        - generic [ref=e31]:
+          - generic [ref=e32]:
+            - generic [ref=e33]: Mobile Number
+            - textbox "Mobile Number" [ref=e34]:
+              - /placeholder: 0501 234 567
+          - generic [ref=e35]:
+            - generic [ref=e36]: Password
+            - textbox "Password" [ref=e37]:
+              - /placeholder: Your secret word
+          - link "Forgot Password?" [ref=e38] [cursor=pointer]:
+            - /url: /forgot-password
+          - button "Log In" [ref=e39] [cursor=pointer]
+        - paragraph [ref=e40]: new here?
+        - link "Create an Account" [ref=e41] [cursor=pointer]:
+          - /url: /register

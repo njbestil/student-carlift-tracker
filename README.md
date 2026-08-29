@@ -54,6 +54,7 @@ cp client/.env.example client/.env
 Set a strong `JWT_SECRET` in `server/.env`. Never commit real secrets.
 
 Client `VITE_*` variables are bundled into frontend code and must be treated as public. Do not put backend secrets in `client/.env`.
+Set `VITE_GOOGLE_MAPS_API_KEY` in `client/.env` to enable the student live map and address locator. Restrict this browser key by HTTP referrer in Google Cloud and enable the Maps JavaScript API, Places API, and Places API (New).
 
 ## PostgreSQL With Docker
 
@@ -150,11 +151,71 @@ This keeps authentication shared across roles while allowing Admin, Driver, and 
 - `GET /api/users/me`
 - `PATCH /api/users/me`
 - `GET /api/students/me`
+- `GET /api/students/me/driver` (student only; returns the assigned driver's contact and vehicle details)
 - `PATCH /api/students/me`
+- `PATCH /api/students/:userId/service-status` (legacy driver-only endpoint; requires an active trip; body: `{ "serviceStatus": "ABSENT" | "WAITING" | "PICKED_UP" | "DROPPED_OFF" }`)
 - `GET /api/drivers/me`
+- `GET /api/drivers/me/dashboard` (driver only; returns the driver profile and assigned students)
 - `PATCH /api/drivers/me`
-- `POST /api/vehicle-locations`
-- `GET /api/vehicle-locations/latest/:driverId`
+- `PATCH /api/drivers/me/service-status` (driver only; body: `{ "isOnService": true | false }`)
+- `POST /api/drivers/me/trips` (driver only; body: `{ "tripOrigin": "HOME" | "SCHOOL" }`)
+- `PATCH /api/drivers/me/trips/students/:userId/status` (driver only; body: `{ "serviceStatus": "ABSENT" | "WAITING" | "PICKED_UP" | "DROPPED_OFF" }`)
+- `POST /api/vehicle-locations` (driver only; throttled by the client)
+- `GET /api/vehicle-locations/my-driver/latest` (student only; reads assigned driver location)
+- `GET /api/vehicle-locations/latest/:driverId` (admin, assigned student, or the driver themself)
+
+## Driver Trip Flow
+
+The driver dashboard is organised around a route-level trip rather than independent status toggles. This prevents a driver from having to reset every student before the afternoon journey and prevents invalid transitions such as dropping off a student who was never picked up.
+
+### Start a trip
+
+The dashboard presents a single route action:
+
+- **Start school run**: sets `tripOrigin` to `HOME` for the Home → School journey.
+- **Start return trip**: sets `tripOrigin` to `SCHOOL` for the School → Home journey and resets completed, non-absent riders from `DROPPED_OFF` to `WAITING` in one confirmed batch action.
+
+Students marked `ABSENT` remain absent until the driver explicitly marks them present. The start-trip confirmation must show the affected rider counts before applying the reset.
+
+### Student status actions
+
+Each student card exposes only the next valid action:
+
+| Current status | Driver action | Result |
+| --- | --- | --- |
+| `WAITING` | Pick up | `PICKED_UP` |
+| `PICKED_UP` | Drop off | `DROPPED_OFF` |
+| `DROPPED_OFF` | Completed | No action |
+| `ABSENT` | Mark present | `WAITING` |
+
+The server must enforce these transitions, ensure the student is assigned to the authenticated driver, and reject duplicate or out-of-sequence updates.
+
+```text
+Start school run (HOME) or start return trip (SCHOOL)
+  -> eligible students become WAITING
+  -> Pick up -> PICKED_UP
+  -> Drop off -> DROPPED_OFF
+  -> all eligible students dropped off -> trip complete
+  -> start return trip resets completed riders to WAITING
+```
+
+### Trip history
+
+`driver_trip_runs` stores each route and `driver_trip_run_students` stores each student's status and pickup/drop-off timestamps for that route. The current `student_profiles.service_status` remains a convenient latest-status projection, while the trip-run tables retain the morning and afternoon history independently.
+
+## Live Vehicle Tracking
+
+Driver GPS updates are sent from the driver phone through the Express API and stored in PostgreSQL. Students read only their assigned driver's latest location through `/api/vehicle-locations/my-driver/latest`; the browser never chooses an arbitrary driver as the source of truth.
+
+Until an admin assignment UI exists, the oldest active driver account is the single static driver. Migration `006_configure_static_driver.sql` changes that driver's mobile number to `0522465535` and assigns every student profile to that driver. New student profiles are assigned automatically when saved.
+
+To keep free-tier usage low:
+
+- Driver GPS sharing starts only after the driver turns service on.
+- The driver client saves the first available GPS position, then posts only about every 30 seconds or after meaningful movement.
+- The student client loads Google Maps only when the Live Map dialog opens.
+- Student location polling runs only while the dialog is open and the tab is visible.
+- The MVP does not call Google Directions, Distance Matrix, Places, or Geocoding APIs.
 
 ## Next Development Phase
 

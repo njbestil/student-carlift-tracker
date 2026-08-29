@@ -14,7 +14,7 @@ export const createApp = () => {
       origin: environment.CLIENT_URL,
     }),
   );
-  app.use(express.json({ limit: '100kb' }));
+  app.use(express.json({ limit: '1500kb' }));
 
   app.use('/api', apiRouter);
   app.use(notFound);

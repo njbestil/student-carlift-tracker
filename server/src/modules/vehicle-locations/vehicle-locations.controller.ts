@@ -13,7 +13,24 @@ export const vehicleLocationsController = {
   }) satisfies RequestHandler,
 
   latest: (async (request, response) => {
-    const location = await vehicleLocationsService.latest(String(request.params.driverId));
+    if (!request.user) {
+      throw new AppError('Authentication required', 401);
+    }
+
+    const location = await vehicleLocationsService.latestForViewer(
+      request.user.id,
+      request.user.role,
+      String(request.params.driverId),
+    );
+    response.json({ location });
+  }) satisfies RequestHandler,
+
+  latestForAssignedDriver: (async (request, response) => {
+    if (!request.user) {
+      throw new AppError('Authentication required', 401);
+    }
+
+    const location = await vehicleLocationsService.latestForAssignedDriver(request.user.id, request.user.role);
     response.json({ location });
   }) satisfies RequestHandler,
 };

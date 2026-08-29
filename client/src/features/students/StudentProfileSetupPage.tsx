@@ -1,16 +1,17 @@
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../app/providers/useAuth';
+import { ToastNotification } from '../../components/ui/ToastNotification';
 import { ApiError } from '../../services/api/apiError';
 import { studentsApi } from './students.api';
+import { StudentProfileForm } from './components/StudentProfileForm';
 
 export const StudentProfileSetupPage = () => {
   const navigate = useNavigate();
   const { token, user, updateUser } = useAuth();
   const [error, setError] = useState('');
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = async (values: Parameters<typeof studentsApi.updateMe>[0]) => {
     setError('');
 
     if (!token || !user) {
@@ -18,19 +19,8 @@ export const StudentProfileSetupPage = () => {
       return;
     }
 
-    const formData = new FormData(event.currentTarget);
-
     try {
-      await studentsApi.updateMe(
-        {
-          studentFullName: String(formData.get('studentFullName') ?? ''),
-          parentFullName: String(formData.get('parentFullName') ?? ''),
-          completeAddress: String(formData.get('completeAddress') ?? ''),
-          emergencyNumber: String(formData.get('emergencyNumber') ?? ''),
-          profilePhotoUrl: String(formData.get('profilePhotoUrl') ?? ''),
-        },
-        token,
-      );
+      await studentsApi.updateMe(values, token);
       updateUser({ ...user, profileCompleted: true });
       navigate('/student/dashboard', { replace: true });
     } catch (caughtError) {
@@ -39,30 +29,19 @@ export const StudentProfileSetupPage = () => {
   };
 
   return (
-    <section className="content-panel" aria-labelledby="student-profile-setup-heading">
-      <h1 id="student-profile-setup-heading">Student profile setup</h1>
-      <p>Primary mobile number: {user?.mobileNumber}</p>
-      <p className="form-error" role="alert">
-        {error}
-      </p>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="studentFullName">Student full name</label>
-        <input id="studentFullName" name="studentFullName" required autoComplete="name" />
-
-        <label htmlFor="parentFullName">Parent full name</label>
-        <input id="parentFullName" name="parentFullName" required autoComplete="name" />
-
-        <label htmlFor="completeAddress">Complete address</label>
-        <textarea id="completeAddress" name="completeAddress" required rows={4} autoComplete="street-address" />
-
-        <label htmlFor="emergencyNumber">Emergency mobile number</label>
-        <input id="emergencyNumber" name="emergencyNumber" required autoComplete="tel" placeholder="0501234567" />
-
-        <label htmlFor="profilePhotoUrl">Profile photo URL</label>
-        <input id="profilePhotoUrl" name="profilePhotoUrl" type="url" />
-
-        <button type="submit">Save profile</button>
-      </form>
+    <section aria-labelledby="student-profile-setup-heading">
+      <div className="text-center">
+        <h1 id="student-profile-setup-heading" className="display-heading">
+          Tell us about your rider
+        </h1>
+        <p className="body-copy">A few details help every pickup feel safe and familiar.</p>
+      </div>
+      <ToastNotification message={error} variant="error" onClose={() => setError('')} />
+      <StudentProfileForm
+        initialValues={{ studentFullName: '', parentFullName: '', completeAddress: '', emergencyNumber: '', profilePhotoUrl: '' }}
+        onSubmit={handleSubmit}
+        submitLabel="Save Profile"
+      />
     </section>
   );
 };
