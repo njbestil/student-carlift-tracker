@@ -119,6 +119,7 @@
   .ui-button,
   .ui-button-primary,
   .ui-button-secondary,
+  .ui-button-secondary-disabled,
   .ui-button-success {
     @apply inline-flex min-h-14 w-full items-center justify-center rounded-full px-7 py-4 font-display text-lg font-semibold transition-transform duration-150 active:translate-y-1;
   }
@@ -127,6 +128,13 @@
   }
   .ui-button-secondary {
     @apply border-2 border-sky/25 bg-white text-sky shadow-[0_6px_0_#e6eef7] active:shadow-[0_3px_0_#e6eef7];
+  }
+  .ui-button-secondary-disabled {
+    @apply border-2 border-sky/25 bg-white text-sky shadow-[0_6px_0_#e6eef7]
+       active:shadow-[0_3px_0_#e6eef7]
+       disabled:cursor-not-allowed disabled:opacity-50
+       disabled:shadow-[0_3px_0_#e6eef7]
+       disabled:active:shadow-[0_3px_0_#e6eef7];
   }
   .ui-button-success {
     @apply bg-leaf text-white shadow-[0_8px_0_#3ca879] active:shadow-[0_4px_0_#3ca879];

@@ -31,6 +31,19 @@ export const forgotPasswordSchema = z.object({
   mobileNumber: mobileNumberSchema,
 });
 
+export const resetPasswordSchema = z
+  .object({
+    mobileNumber: mobileNumberSchema,
+    newPassword: passwordSchema,
+    confirmPassword: passwordSchema,
+    resetToken: z.string().min(1, 'Reset link token is required'),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'Confirm password must match new password',
+  });
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;

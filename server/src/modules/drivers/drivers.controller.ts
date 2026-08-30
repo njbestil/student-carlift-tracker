@@ -61,4 +61,13 @@ export const driversController = {
     );
     response.json(result);
   }) satisfies RequestHandler,
+
+  cancelActiveTrip: (async (request, response) => {
+    if (!request.user) {
+      throw new AppError('Authentication required', 401);
+    }
+
+    const trip = await driversService.cancelActiveTrip(request.user.id, request.user.role);
+    response.json({ trip });
+  }) satisfies RequestHandler,
 };

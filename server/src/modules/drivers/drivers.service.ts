@@ -108,4 +108,22 @@ export const driversService = {
 
     return result;
   },
+
+  async cancelActiveTrip(userId: string, role: string) {
+    if (role !== 'DRIVER') {
+      throw new AppError('Only driver accounts can cancel trips', 403);
+    }
+
+    const result = await driversRepository.cancelActiveTrip(userId);
+
+    if (result.kind === 'no_active_trip') {
+      throw new AppError('There is no active trip to cancel', 409);
+    }
+
+    if (result.kind === 'riders_not_all_absent') {
+      throw new AppError('Mark every rider absent before cancelling the trip', 409);
+    }
+
+    return result.trip;
+  },
 };

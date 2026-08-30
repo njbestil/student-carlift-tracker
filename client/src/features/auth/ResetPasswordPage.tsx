@@ -6,32 +6,38 @@ import { ApiError } from '../../services/api/apiError';
 import { authApi } from './auth.api';
 import { normalizeUaeMobileNumber, uaeMobileNumberPattern } from '../../utils/uaeMobileNumber';
 
-export const ForgotPasswordPage = () => {
+export const ResetPasswordPage = () => {
+  const resetToken = new URLSearchParams(window.location.hash.slice(1)).get('token') ?? '';
   const [message, setMessage] = useState('');
   const [messageVariant, setMessageVariant] = useState<ToastVariant>('success');
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const form = event.currentTarget;
     setMessage('');
-    const formData = new FormData(event.currentTarget);
+    const formData = new FormData(form);
 
     try {
-      const result = await authApi.forgotPassword(String(formData.get('mobileNumber') ?? ''));
-      setMessageVariant('info');
+      const result = await authApi.resetPassword({
+        mobileNumber: String(formData.get('mobileNumber') ?? ''),
+        newPassword: String(formData.get('newPassword') ?? ''),
+        confirmPassword: String(formData.get('confirmPassword') ?? ''),
+        resetToken,
+      });
+      setMessageVariant('success');
       setMessage(result.message);
+      form.reset();
     } catch (caughtError) {
       setMessageVariant('error');
-      setMessage(
-        caughtError instanceof ApiError ? caughtError.message : 'Unable to submit reset request',
-      );
+      setMessage(caughtError instanceof ApiError ? caughtError.message : 'Unable to reset password');
     }
   };
 
   return (
     <AuthScaffold
-      headingId="forgot-password-heading"
-      title="Find your key"
-      subtitle="Enter your mobile number and we'll help you get back in."
+      headingId="reset-password-heading"
+      title="Choose a new key"
+      subtitle="Set a new password for your account."
     >
       <ToastNotification
         message={message}
@@ -58,8 +64,36 @@ export const ForgotPasswordPage = () => {
             placeholder="0501234567"
           />
         </div>
-        <button className="ui-button-primary" type="submit">
-          Request Reset
+        <div>
+          <label className="ui-label" htmlFor="newPassword">
+            New Password
+          </label>
+          <input
+            className="ui-field"
+            id="newPassword"
+            name="newPassword"
+            type="password"
+            autoComplete="new-password"
+            minLength={8}
+            required
+          />
+        </div>
+        <div>
+          <label className="ui-label" htmlFor="confirmPassword">
+            Confirm Password
+          </label>
+          <input
+            className="ui-field"
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            minLength={8}
+            required
+          />
+        </div>
+        <button className="ui-button-success" type="submit">
+          Reset Password
         </button>
       </form>
       <Link className="ui-button-secondary mt-7" to="/login">

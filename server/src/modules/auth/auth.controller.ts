@@ -16,4 +16,9 @@ export const authController = {
     const result = await authService.forgotPassword();
     response.json(result);
   }) satisfies RequestHandler,
+
+  resetPassword: (async (request, response) => {
+    const result = await authService.resetPassword(request.body);
+    response.json(result);
+  }) satisfies RequestHandler,
 };

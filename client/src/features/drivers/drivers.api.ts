@@ -40,7 +40,7 @@ export type AssignedStudent = {
 export type DriverTrip = {
   id: string;
   tripOrigin: 'HOME' | 'SCHOOL';
-  status: 'IN_PROGRESS' | 'COMPLETED';
+  status: 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
   startedAt: string;
   completedAt: string | null;
 };
@@ -70,6 +70,11 @@ export const driversApi = {
     apiClient<{ trip: DriverTrip }>('/drivers/me/trips', {
       method: 'POST',
       body: { tripOrigin },
+      token,
+    }),
+  cancelActiveTrip: (token: string) =>
+    apiClient<{ trip: DriverTrip }>('/drivers/me/trips/active', {
+      method: 'DELETE',
       token,
     }),
   updateStudentServiceStatus: (userId: string, serviceStatus: StudentServiceStatus, token: string) =>

@@ -47,6 +47,17 @@ export const authRepository = {
     return result.rows[0] ? mapUserRow(result.rows[0]) : null;
   },
 
+  async updatePasswordByMobileNumber(mobileNumber: string, passwordHash: string): Promise<boolean> {
+    const result = await pool.query(
+      `UPDATE users
+       SET password_hash = $2
+       WHERE mobile_number = $1 AND is_active = true`,
+      [mobileNumber, passwordHash],
+    );
+
+    return result.rowCount === 1;
+  },
+
   async findPublicUserById(id: string): Promise<PublicUser | null> {
     const result = await pool.query<UserRow>(
       `SELECT id, mobile_number, password_hash, role, profile_completed, is_active

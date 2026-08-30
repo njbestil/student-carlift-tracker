@@ -12,6 +12,9 @@ const environmentSchema = z.object({
   JWT_SECRET: z.string().min(16, 'JWT_SECRET must be at least 16 characters long'),
   JWT_EXPIRES_IN: z.string().min(1).default('1d'),
   CLIENT_URL: z.string().url(),
+  PASSWORD_RESET_ACCESS_TOKEN: z
+    .string()
+    .min(32, 'PASSWORD_RESET_ACCESS_TOKEN must be at least 32 characters long'),
 });
 
 const parsedEnvironment = environmentSchema.safeParse(process.env);

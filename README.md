@@ -53,6 +53,8 @@ cp client/.env.example client/.env
 
 Set a strong `JWT_SECRET` in `server/.env`. Never commit real secrets.
 
+Set `PASSWORD_RESET_ACCESS_TOKEN` to a cryptographically random value of at least 32 characters. The temporary support reset link is `${CLIENT_URL}/reset-password#token=<PASSWORD_RESET_ACCESS_TOKEN>`; distribute it privately and rotate the token immediately if it is exposed. The fragment keeps the token out of the initial server request and its access logs.
+
 Client `VITE_*` variables are bundled into frontend code and must be treated as public. Do not put backend secrets in `client/.env`.
 Set `VITE_GOOGLE_MAPS_API_KEY` in `client/.env` to enable the student live map and address locator. Restrict this browser key by HTTP referrer in Google Cloud and enable the Maps JavaScript API, Places API, and Places API (New).
 
@@ -124,6 +126,32 @@ Profile saved -> profileCompleted true -> /student/dashboard
 
 Incomplete users can access their own setup route without redirect loops.
 
+## Temporary Password Reset Flow
+
+Until an admin-managed, per-user reset process is available, support can reset a user's password by privately sharing a protected reset link.
+
+1. Generate a token locally:
+
+   ```bash
+   node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
+   ```
+
+2. Set the generated value as `PASSWORD_RESET_ACCESS_TOKEN` in `server/.env`, then restart the server.
+3. Privately share this link, replacing the placeholder with that same value:
+
+   ```text
+   ${CLIENT_URL}/reset-password#token=<PASSWORD_RESET_ACCESS_TOKEN>
+   ```
+
+4. The user enters their UAE mobile number, a new password, and matching confirmation. The page reads the token from the URL fragment and sends it only when submitting `POST /api/auth/reset-password`.
+5. The API checks the token, validates the mobile number and passwords, confirms the account is active, hashes the new password with bcrypt, and updates the account password. A successful reset returns the user to the log-in flow.
+
+The token is deliberately kept in the URL fragment (`#token=...`) rather than a query parameter, so it is not included in the browser's initial request to the server or its access logs.
+
+### Security limitation
+
+This is a temporary shared reset link: anyone who has it can reset the password of any active account if they know that account's mobile number. Do not publish it, and rotate `PASSWORD_RESET_ACCESS_TOKEN` immediately if it is exposed. The planned replacement is a per-user, single-use token with an expiry, delivered through an approved support or SMS workflow.
+
 ## Account Data Vs Profile Data
 
 `users` contains authentication and account-level data:
@@ -148,6 +176,7 @@ This keeps authentication shared across roles while allowing Admin, Driver, and 
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `POST /api/auth/forgot-password`
+- `POST /api/auth/reset-password`
 - `GET /api/users/me`
 - `PATCH /api/users/me`
 - `GET /api/students/me`
@@ -220,7 +249,7 @@ To keep free-tier usage low:
 ## Next Development Phase
 
 - Admin-controlled driver creation and role management.
-- Password reset token workflow and SMS integration.
+- Per-user, one-time password reset tokens and SMS integration.
 - File upload/storage for profile photos.
 - Student-driver assignment and route planning.
 - Vehicle/location UI and Google Maps integration.

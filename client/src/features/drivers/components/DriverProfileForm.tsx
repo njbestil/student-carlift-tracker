@@ -1,6 +1,7 @@
 import { type ChangeEvent, type FormEvent, useEffect, useId, useRef, useState } from 'react';
 import { Camera, MapPin, UserRound } from 'lucide-react';
 import { GoogleMapsLocatorDialog, type LocationSelection } from '../../../components/GoogleMapsLocatorDialog';
+import { validateProfilePhoto } from '../../../utils/profilePhoto';
 import type { DriverProfilePayload } from '../drivers.api';
 
 type DriverProfileFormValues = DriverProfilePayload & { contactNumber: string };
@@ -11,8 +12,6 @@ type DriverProfileFormProps = {
   onSubmit: (values: DriverProfileFormValues) => Promise<void>;
   submitLabel: string;
 };
-
-const maxPhotoSizeBytes = 1024 * 1024;
 
 export const DriverProfileForm = ({
   initialValues,
@@ -32,16 +31,14 @@ export const DriverProfileForm = ({
     setValues((current) => ({ ...current, [key]: value }));
   };
 
-  const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = '';
     if (!file) return;
-    if (!file.type.startsWith('image/')) {
-      setPhotoError('Choose an image file.');
-      return;
-    }
-    if (file.size > maxPhotoSizeBytes) {
-      setPhotoError('Choose an image smaller than 1 MB.');
+
+    const validationError = await validateProfilePhoto(file);
+    if (validationError) {
+      setPhotoError(validationError);
       return;
     }
 
@@ -77,7 +74,7 @@ export const DriverProfileForm = ({
         <div className="flex size-24 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-sky-soft text-ink shadow-[0_6px_0_#e6eef7]">
           {values.profilePhotoUrl ? <img className="size-full object-cover" src={values.profilePhotoUrl} alt="Driver profile" /> : <UserRound className="size-11" strokeWidth={2.5} />}
         </div>
-        <input ref={fileInputRef} id={photoInputId} className="sr-only" type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={handlePhotoChange} />
+        <input ref={fileInputRef} id={photoInputId} className="sr-only" type="file" accept="image/png,image/jpeg,image/webp" capture="user" onChange={(event) => void handlePhotoChange(event)} />
         <button className="ui-button-secondary min-h-0 w-auto px-5 py-2 text-base" type="button" onClick={() => fileInputRef.current?.click()}>
           <Camera className="mr-2 size-5" aria-hidden="true" strokeWidth={2.5} />
           Change Photo

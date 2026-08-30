@@ -34,6 +34,11 @@ driversRouter.patch(
   validateBody(updateTripStudentStatusSchema),
   asyncHandler(driversController.updateTripStudentStatus),
 );
+driversRouter.delete(
+  '/me/trips/active',
+  authenticate,
+  asyncHandler(driversController.cancelActiveTrip),
+);
 driversRouter.patch(
   '/me',
   authenticate,

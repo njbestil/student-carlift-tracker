@@ -2,7 +2,7 @@ import { AlertTriangle, CheckCircle2, X } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import clsx from 'clsx';
 
-export type ToastVariant = 'error' | 'warning' | 'success';
+export type ToastVariant = 'error' | 'warning' | 'success' | 'info';
 
 type ToastNotificationProps = {
   message: string;
@@ -23,6 +23,12 @@ const toastStyles = {
     className: 'border-amber-200 bg-amber-50 text-amber-900 shadow-[0_6px_0_#fde68a]',
     iconClassName: 'bg-amber-100 text-amber-700',
   },
+  info: {
+    title: 'Info',
+    icon: AlertTriangle,
+    className: 'border-sky-200 bg-sky-soft text-sky-dark shadow-[0_6px_0_#cfe8fb]',
+    iconClassName: 'bg-white/80 text-sky-dark',
+  },
   success: {
     title: 'Success',
     icon: CheckCircle2,
@@ -37,7 +43,7 @@ export const ToastNotification = ({
   onClose,
 }: ToastNotificationProps) => {
   const { title, icon: Icon, className, iconClassName } = toastStyles[variant];
-  const role = variant === 'success' ? 'status' : 'alert';
+  const role = variant === 'success' || variant === 'info' ? 'status' : 'alert';
 
   return createPortal(
     <div className="pointer-events-none absolute top-4 right-4 z-[60] w-[min(calc(100vw-2rem),22rem)]">

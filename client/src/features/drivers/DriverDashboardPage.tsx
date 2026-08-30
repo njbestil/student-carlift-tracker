@@ -17,6 +17,7 @@ export const DriverDashboardPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdatingService, setIsUpdatingService] = useState(false);
   const [isStartingTrip, setIsStartingTrip] = useState(false);
+  const [isCancellingTrip, setIsCancellingTrip] = useState(false);
   const [updatingStudentId, setUpdatingStudentId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [selectedStudent, setSelectedStudent] = useState<AssignedStudent | null>(null);
@@ -94,6 +95,21 @@ export const DriverDashboardPage = () => {
     }
   };
 
+  const cancelActiveTrip = async () => {
+    if (!token || isCancellingTrip) return;
+
+    setIsCancellingTrip(true);
+    setError('');
+    try {
+      await driversApi.cancelActiveTrip(token);
+      setDashboard((current) => current ? { ...current, activeTrip: null } : current);
+    } catch (caughtError) {
+      setError(caughtError instanceof ApiError ? caughtError.message : 'Unable to cancel the trip.');
+    } finally {
+      setIsCancellingTrip(false);
+    }
+  };
+
   const students = dashboard?.students ?? [];
   const onBoardCount = students.filter((student) => student.serviceStatus === 'PICKED_UP').length;
   const driverName = dashboard?.profile?.fullName ?? 'Driver';
@@ -113,7 +129,14 @@ export const DriverDashboardPage = () => {
           <p className="body-copy">{onBoardCount} {onBoardCount === 1 ? 'student' : 'students'} on board &middot; {students.length} total</p>
         </div>
         <DriverRideStatusCard isOnService={onService} isUpdating={isUpdatingService} locationMessage={locationPublisher.message} onToggle={() => void toggleService()} />
-        <DriverTripCard activeTrip={dashboard.activeTrip} students={students} isStarting={isStartingTrip} onStart={(tripOrigin) => void startTrip(tripOrigin)} />
+        <DriverTripCard
+          activeTrip={dashboard.activeTrip}
+          students={students}
+          isStarting={isStartingTrip}
+          isCancelling={isCancellingTrip}
+          onStart={(tripOrigin) => void startTrip(tripOrigin)}
+          onCancel={() => void cancelActiveTrip()}
+        />
         <h2 className="section-heading mb-4">Today's Riders</h2>
         {students.length ? <div className="grid gap-4">
           {students.map((student) => <AssignedStudentCard key={student.userId} student={student} isTripActive={dashboard.activeTrip !== null} isUpdating={updatingStudentId === student.userId} onOpenMap={setSelectedStudent} onStatusChange={(nextStudent, status) => void updateStudentStatus(nextStudent, status)} />)}

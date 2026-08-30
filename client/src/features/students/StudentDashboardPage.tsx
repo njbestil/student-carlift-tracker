@@ -15,6 +15,7 @@ import { studentsApi } from './students.api';
 import type { AssignedDriver, StudentProfile } from './students.api';
 
 const STUDENT_LOCATION_POLL_INTERVAL_MS = 30_000;
+const STUDENT_STATUS_POLL_INTERVAL_MS = 20_000;
 
 export const StudentDashboardPage = () => {
   const mapDialogRef = useRef<HTMLDialogElement>(null);
@@ -57,6 +58,46 @@ export const StudentDashboardPage = () => {
 
   useEffect(() => {
     void loadProfile();
+  }, [loadProfile]);
+
+  useEffect(() => {
+    let intervalId: number | undefined;
+
+    const startPolling = () => {
+      if (intervalId !== undefined) return;
+
+      intervalId = window.setInterval(() => {
+        void loadProfile();
+      }, STUDENT_STATUS_POLL_INTERVAL_MS);
+    };
+
+    const stopPolling = () => {
+      if (intervalId === undefined) return;
+
+      window.clearInterval(intervalId);
+      intervalId = undefined;
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void loadProfile();
+        startPolling();
+        return;
+      }
+
+      stopPolling();
+    };
+
+    if (document.visibilityState === 'visible') {
+      startPolling();
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      stopPolling();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [loadProfile]);
 
   const loadAssignedDriver = useCallback(async () => {

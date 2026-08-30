@@ -35,7 +35,7 @@ export type AssignedStudent = {
 export type DriverTrip = {
   id: string;
   tripOrigin: 'HOME' | 'SCHOOL';
-  status: 'IN_PROGRESS' | 'COMPLETED';
+  status: 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
   startedAt: string;
   completedAt: string | null;
 };
@@ -45,6 +45,11 @@ type TripStatusTransitionResult =
   | { kind: 'no_active_trip' }
   | { kind: 'student_not_in_trip' }
   | { kind: 'invalid_transition'; currentStatus: AssignedStudent['serviceStatus'] };
+
+type CancelTripResult =
+  | { kind: 'cancelled'; trip: DriverTrip }
+  | { kind: 'no_active_trip' }
+  | { kind: 'riders_not_all_absent' };
 
 type DriverProfileRow = {
   id: string;
@@ -372,6 +377,59 @@ export const driversRepository = {
       const student = students.find((candidate) => candidate.userId === studentUserId);
 
       return { kind: 'updated', student: student!, trip: completedResult.rows[0] ? mapDriverTrip(completedResult.rows[0]) : mapDriverTrip(tripRow) };
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
+  },
+
+  async cancelActiveTrip(driverUserId: string): Promise<CancelTripResult> {
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+      const tripResult = await client.query<DriverTripRow>(
+        `SELECT id, trip_origin, status, started_at, completed_at
+         FROM driver_trip_runs
+         WHERE driver_user_id = $1
+           AND status = 'IN_PROGRESS'
+         FOR UPDATE`,
+        [driverUserId],
+      );
+      const tripRow = tripResult.rows[0];
+
+      if (!tripRow) {
+        await client.query('ROLLBACK');
+        return { kind: 'no_active_trip' };
+      }
+
+      const remainingRidersResult = await client.query<{ exists: boolean }>(
+        `SELECT EXISTS (
+           SELECT 1
+           FROM driver_trip_run_students
+           WHERE trip_run_id = $1
+             AND service_status <> 'ABSENT'
+         )`,
+        [tripRow.id],
+      );
+
+      if (remainingRidersResult.rows[0].exists) {
+        await client.query('ROLLBACK');
+        return { kind: 'riders_not_all_absent' };
+      }
+
+      const cancelledResult = await client.query<DriverTripRow>(
+        `UPDATE driver_trip_runs
+         SET status = 'CANCELLED', completed_at = now(), updated_at = now()
+         WHERE id = $1
+         RETURNING id, trip_origin, status, started_at, completed_at`,
+        [tripRow.id],
+      );
+
+      await client.query('COMMIT');
+      return { kind: 'cancelled', trip: mapDriverTrip(cancelledResult.rows[0]) };
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;

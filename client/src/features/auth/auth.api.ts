@@ -12,6 +12,13 @@ export type LoginPayload = {
   password: string;
 };
 
+export type ResetPasswordPayload = {
+  mobileNumber: string;
+  newPassword: string;
+  confirmPassword: string;
+  resetToken: string;
+};
+
 export const authApi = {
   register: (payload: RegisterPayload) =>
     apiClient<AuthResponse>('/auth/register', {
@@ -29,5 +36,11 @@ export const authApi = {
     apiClient<{ message: string }>('/auth/forgot-password', {
       method: 'POST',
       body: { mobileNumber },
+    }),
+
+  resetPassword: (payload: ResetPasswordPayload) =>
+    apiClient<{ message: string }>('/auth/reset-password', {
+      method: 'POST',
+      body: payload,
     }),
 };
