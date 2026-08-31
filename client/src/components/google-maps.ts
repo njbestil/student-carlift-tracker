@@ -13,39 +13,15 @@ export const toGoogleLatLngLiteral = (position: GoogleLatLng): GoogleLatLngLiter
   lng: typeof position.lng === 'function' ? position.lng() : position.lng,
 });
 
-export type GoogleMarkerIcon = {
-  anchor?: GooglePoint;
-  fillColor?: string;
-  fillOpacity?: number;
-  path?: number;
-  rotation?: number;
-  scale?: number;
-  scaledSize?: GoogleSize;
-  strokeColor?: string;
-  strokeWeight?: number;
-  url?: string;
-};
-
 export type GoogleMap = {
   addListener(eventName: 'click', handler: (event: { latLng: GoogleLatLng | null }) => void): void;
   panTo(position: GoogleLatLng): void;
   setCenter(position: GoogleLatLng): void;
 };
 
-export type GoogleMarker = {
-  setIcon(icon: GoogleMarkerIcon): void;
-  setMap(map: GoogleMap | null): void;
-  setPosition(position: GoogleLatLng): void;
-};
-
-export type GooglePoint = {
-  x: number;
-  y: number;
-};
-
-export type GoogleSize = {
-  height: number;
-  width: number;
+export type GoogleAdvancedMarker = {
+  map: GoogleMap | null;
+  position: GoogleLatLng;
 };
 
 export type GoogleMapsNamespace = {
@@ -63,20 +39,20 @@ export type GoogleMapsNamespace = {
         center: GoogleLatLng;
         disableDefaultUI?: boolean;
         gestureHandling?: 'cooperative';
+        mapId?: string;
         mapTypeControl?: boolean;
         streetViewControl?: boolean;
         zoom: number;
       },
     ) => GoogleMap;
-    Marker: new (options: {
-      animation?: number;
-      icon?: GoogleMarkerIcon;
-      map: GoogleMap;
-      position: GoogleLatLng;
-      title: string;
-    }) => GoogleMarker;
-    Point: new (x: number, y: number) => GooglePoint;
-    Size: new (width: number, height: number) => GoogleSize;
+    marker: {
+      AdvancedMarkerElement: new (options: {
+        content?: HTMLElement;
+        map: GoogleMap;
+        position: GoogleLatLng;
+        title: string;
+      }) => GoogleAdvancedMarker;
+    };
     importLibrary(libraryName: 'places'): Promise<GooglePlacesLibrary>;
   };
 };
@@ -126,7 +102,7 @@ export const loadGoogleMaps = (apiKey: string) => {
     const searchParams = new URLSearchParams({
       callback: googleMapsCallbackName,
       key: apiKey,
-      libraries: 'places',
+      libraries: 'places,marker',
       loading: 'async',
       v: 'weekly',
     });
@@ -155,3 +131,5 @@ export const loadGoogleMaps = (apiKey: string) => {
 
   return googleMapsPromise;
 };
+
+export const getGoogleMapId = () => import.meta.env.VITE_GOOGLE_MAP_ID || null;

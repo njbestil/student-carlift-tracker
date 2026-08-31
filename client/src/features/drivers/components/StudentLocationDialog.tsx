@@ -1,6 +1,11 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { X } from 'lucide-react';
-import { loadGoogleMaps, type GoogleMap, type GoogleMarker } from '../../../components/google-maps';
+import {
+  getGoogleMapId,
+  loadGoogleMaps,
+  type GoogleAdvancedMarker,
+  type GoogleMap,
+} from '../../../components/google-maps';
 import type { AssignedStudent } from '../drivers.api';
 
 type StudentLocationDialogProps = {
@@ -12,7 +17,7 @@ export const StudentLocationDialog = ({ student, onClose }: StudentLocationDialo
   const dialogRef = useRef<HTMLDialogElement>(null);
   const mapElementRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<GoogleMap | null>(null);
-  const markerRef = useRef<GoogleMarker | null>(null);
+  const markerRef = useRef<GoogleAdvancedMarker | null>(null);
   const titleId = useId();
   const [mapError, setMapError] = useState('');
   const hasLocation = student?.latitude !== null && student?.latitude !== undefined
@@ -36,6 +41,12 @@ export const StudentLocationDialog = ({ student, onClose }: StudentLocationDialo
       return;
     }
 
+    const mapId = getGoogleMapId();
+    if (!mapId) {
+      setMapError('Google Maps needs a map ID before it can show pins.');
+      return;
+    }
+
     let active = true;
     const position = { lat: student.latitude!, lng: student.longitude! };
 
@@ -46,11 +57,12 @@ export const StudentLocationDialog = ({ student, onClose }: StudentLocationDialo
           center: position,
           disableDefaultUI: true,
           gestureHandling: 'cooperative',
+          mapId,
           mapTypeControl: false,
           streetViewControl: false,
           zoom: 16,
         });
-        markerRef.current = new maps.maps.Marker({
+        markerRef.current = new maps.maps.marker.AdvancedMarkerElement({
           map: mapRef.current,
           position,
           title: `${student.studentFullName}'s address`,
@@ -62,7 +74,7 @@ export const StudentLocationDialog = ({ student, onClose }: StudentLocationDialo
 
     return () => {
       active = false;
-      markerRef.current?.setMap(null);
+      if (markerRef.current) markerRef.current.map = null;
       markerRef.current = null;
       mapRef.current = null;
     };

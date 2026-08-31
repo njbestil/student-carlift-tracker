@@ -3,11 +3,12 @@ import { createPortal } from 'react-dom';
 import { MapPin, Search, X } from 'lucide-react';
 import { ToastNotification } from './ui/ToastNotification';
 import {
+  getGoogleMapId,
   loadGoogleMaps,
   type GoogleAutocompleteSessionToken,
   type GoogleLatLng,
   type GoogleMap,
-  type GoogleMarker,
+  type GoogleAdvancedMarker,
   type GooglePlacePrediction,
   type GooglePlacesLibrary,
   toGoogleLatLngLiteral,
@@ -40,7 +41,7 @@ export const GoogleMapsLocatorDialog = ({
   const dialogRef = useRef<HTMLDialogElement>(null);
   const mapElementRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<GoogleMap | null>(null);
-  const markerRef = useRef<GoogleMarker | null>(null);
+  const markerRef = useRef<GoogleAdvancedMarker | null>(null);
   const selectedLocationRef = useRef<LocationSelection | null>(null);
   const sessionTokenRef = useRef<GoogleAutocompleteSessionToken | null>(null);
   const titleId = useId();
@@ -69,6 +70,12 @@ export const GoogleMapsLocatorDialog = ({
       return;
     }
 
+    const mapId = getGoogleMapId();
+    if (!mapId) {
+      setMapError('Google Maps needs a map ID before it can show pins.');
+      return;
+    }
+
     let active = true;
     const savedLocation = initialLatitude !== undefined && initialLongitude !== undefined
       ? { address: initialAddress ?? 'Saved location', latitude: initialLatitude, longitude: initialLongitude }
@@ -85,7 +92,7 @@ export const GoogleMapsLocatorDialog = ({
     const setPin = (position: GoogleLatLng, address: string) => {
       if (!active || !mapRef.current || !markerRef.current) return;
       const coordinates = toGoogleLatLngLiteral(position);
-      markerRef.current.setPosition(coordinates);
+      markerRef.current.position = coordinates;
       mapRef.current.panTo(coordinates);
       const location = { address, latitude: coordinates.lat, longitude: coordinates.lng };
       selectedLocationRef.current = location;
@@ -100,11 +107,12 @@ export const GoogleMapsLocatorDialog = ({
           center: startLocation,
           disableDefaultUI: true,
           gestureHandling: 'cooperative',
+          mapId,
           mapTypeControl: false,
           streetViewControl: false,
           zoom: initialLatitude !== undefined && initialLongitude !== undefined ? 16 : 12,
         });
-        const marker = new maps.maps.Marker({ map, position: startLocation, title: 'Selected location' });
+        const marker = new maps.maps.marker.AdvancedMarkerElement({ map, position: startLocation, title: 'Selected location' });
         const geocoder = new maps.maps.Geocoder();
         mapRef.current = map;
         markerRef.current = marker;
@@ -131,7 +139,7 @@ export const GoogleMapsLocatorDialog = ({
 
     return () => {
       active = false;
-      markerRef.current?.setMap(null);
+      if (markerRef.current) markerRef.current.map = null;
       markerRef.current = null;
       mapRef.current = null;
       sessionTokenRef.current = null;
@@ -181,7 +189,7 @@ export const GoogleMapsLocatorDialog = ({
         return;
       }
       const coordinates = toGoogleLatLngLiteral(place.location);
-      markerRef.current?.setPosition(coordinates);
+      if (markerRef.current) markerRef.current.position = coordinates;
       mapRef.current?.panTo(coordinates);
       const location = {
         address: place.formattedAddress ?? place.displayName ?? 'Selected location',

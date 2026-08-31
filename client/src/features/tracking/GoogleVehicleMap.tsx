@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { LocateFixed } from 'lucide-react';
 import schoolCarMarker from '../../assets/school-car.svg';
-import { loadGoogleMaps, type GoogleLatLng, type GoogleMap, type GoogleMarker, type GoogleMarkerIcon, type GoogleMapsNamespace } from '../../components/google-maps';
+import {
+  getGoogleMapId,
+  loadGoogleMaps,
+  type GoogleAdvancedMarker,
+  type GoogleLatLng,
+  type GoogleMap,
+} from '../../components/google-maps';
 import type { VehicleLocation } from './tracking.api';
 
 const toMapPosition = (location: VehicleLocation): GoogleLatLng => ({
@@ -9,11 +15,14 @@ const toMapPosition = (location: VehicleLocation): GoogleLatLng => ({
   lng: Number(location.longitude),
 });
 
-const createVehicleIcon = (maps: GoogleMapsNamespace): GoogleMarkerIcon => ({
-  anchor: new maps.maps.Point(25, 33),
-  scaledSize: new maps.maps.Size(50, 33),
-  url: schoolCarMarker,
-});
+const createVehicleMarkerContent = () => {
+  const image = document.createElement('img');
+  image.alt = '';
+  image.height = 33;
+  image.src = schoolCarMarker;
+  image.width = 50;
+  return image;
+};
 
 type GoogleVehicleMapProps = {
   isActive: boolean;
@@ -23,8 +32,7 @@ type GoogleVehicleMapProps = {
 export const GoogleVehicleMap = ({ isActive, location }: GoogleVehicleMapProps) => {
   const mapElementRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<GoogleMap | null>(null);
-  const markerRef = useRef<GoogleMarker | null>(null);
-  const mapsRef = useRef<GoogleMapsNamespace | null>(null);
+  const markerRef = useRef<GoogleAdvancedMarker | null>(null);
   const [mapError, setMapError] = useState('');
 
   useEffect(() => {
@@ -36,6 +44,13 @@ export const GoogleVehicleMap = ({ isActive, location }: GoogleVehicleMapProps) 
 
     if (!apiKey) {
       setMapError('Add VITE_GOOGLE_MAPS_API_KEY to show the live map.');
+      return;
+    }
+
+    const mapId = getGoogleMapId();
+
+    if (!mapId) {
+      setMapError('Add VITE_GOOGLE_MAP_ID to show the live map.');
       return;
     }
 
@@ -52,15 +67,15 @@ export const GoogleVehicleMap = ({ isActive, location }: GoogleVehicleMapProps) 
           center: position,
           disableDefaultUI: true,
           gestureHandling: 'cooperative',
+          mapId,
           mapTypeControl: false,
           streetViewControl: false,
           zoom: 15,
         });
 
         mapRef.current = map;
-        mapsRef.current = maps;
-        markerRef.current = new maps.maps.Marker({
-          icon: createVehicleIcon(maps),
+        markerRef.current = new maps.maps.marker.AdvancedMarkerElement({
+          content: createVehicleMarkerContent(),
           map,
           position,
           title: 'School car location',
@@ -78,19 +93,18 @@ export const GoogleVehicleMap = ({ isActive, location }: GoogleVehicleMapProps) 
   }, [isActive, location]);
 
   useEffect(() => {
-    if (!location || !mapRef.current || !markerRef.current || !mapsRef.current) {
+    if (!location || !mapRef.current || !markerRef.current) {
       return;
     }
 
     const position = toMapPosition(location);
     mapRef.current.setCenter(position);
-    markerRef.current.setPosition(position);
-    markerRef.current.setIcon(createVehicleIcon(mapsRef.current));
+    markerRef.current.position = position;
   }, [location]);
 
   useEffect(() => {
     return () => {
-      markerRef.current?.setMap(null);
+      if (markerRef.current) markerRef.current.map = null;
     };
   }, []);
 
