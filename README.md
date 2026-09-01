@@ -241,6 +241,11 @@ Driver GPS updates are sent from the driver phone through the Express API and st
 
 Until an admin assignment UI exists, the oldest active driver account is the single static driver. Migration `006_configure_static_driver.sql` changes that driver's mobile number to `0522465535` and assigns every student profile to that driver. New student profiles are assigned automatically when saved.
 
+For a new deployment, set `INITIAL_DRIVER_PASSWORD` (at least 8 characters) and optionally
+`INITIAL_DRIVER_FULL_NAME`, then run `npm run seed:initial-driver --workspace server` after migrations.
+The seed is idempotent: it creates the `0522465535` driver user and linked profile only when they
+do not already exist, and assigns existing students to that driver.
+
 To keep free-tier usage low:
 
 - Driver GPS sharing starts only after the driver turns service on.
