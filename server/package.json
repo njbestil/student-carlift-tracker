@@ -9,7 +9,8 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "migrate": "tsx scripts/migrate.ts"
+    "migrate": "tsx scripts/migrate.ts",
+    "seed:initial-driver": "tsx scripts/seed-initial-driver.ts"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
