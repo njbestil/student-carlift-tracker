@@ -139,6 +139,27 @@
   .ui-button-success {
     @apply bg-leaf text-white shadow-[0_8px_0_#3ca879] active:shadow-[0_4px_0_#3ca879];
   }
+  .ui-call-action {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-3 py-3 font-display text-base font-semibold text-white no-underline transition-transform duration-150 active:translate-y-0.5;
+  }
+  .ui-call-action--contact {
+    @apply bg-leaf shadow-[0_5px_0_#3ca879] active:shadow-[0_2px_0_#3ca879];
+  }
+  .ui-call-action--emergency {
+    @apply bg-[#d95c80] shadow-[0_5px_0_#b94f70] active:shadow-[0_2px_0_#b94f70];
+  }
+  .student-presence-indicator {
+    @apply absolute top-5 right-4 flex size-11 items-center justify-center rounded-full border-[3px] border-[#7b8a9c] bg-[#aeb9c7] p-1 shadow-[0_3px_0_#748296] transition-all duration-150 active:translate-y-0.5 active:shadow-[0_1px_0_#748296];
+  }
+  .student-presence-indicator[aria-pressed='true'] {
+    @apply border-[#3ca879] bg-leaf shadow-[0_3px_0_#2f9066,0_0_14px_#62c99a];
+  }
+  .student-presence-indicator__light {
+    @apply size-5 rounded-full bg-white/80 shadow-inner;
+  }
+  .student-presence-indicator[aria-pressed='true'] .student-presence-indicator__light {
+    @apply bg-[#d9ffed] shadow-[0_0_8px_#ffffff];
+  }
   .form-stack {
     @apply grid gap-5;
   }
@@ -166,6 +187,84 @@
   }
   .dashboard-tile {
     @apply flex min-h-28 flex-col items-start justify-between rounded-3xl border-0 p-4 text-start shadow-[0_6px_0_#e6eef7] transition-transform active:translate-y-1;
+  }
+  .driver-id-dialog {
+    @apply relative min-h-[35.5rem] overflow-hidden bg-white;
+  }
+  .driver-id-dialog__header {
+    @apply relative h-36 overflow-hidden bg-sky-soft px-5 pt-5;
+    background-image: linear-gradient(to bottom, #eaf6ff 0 72%, #b7c4d3 72% 100%);
+  }
+  .driver-id-dialog__header::after {
+    content: '';
+    @apply absolute inset-x-0 bottom-3 h-1;
+    background: repeating-linear-gradient(to right, #fffaf0 0 18px, transparent 18px 34px);
+  }
+  .driver-id-dialog__header-label {
+    @apply relative z-10 text-xs font-extrabold uppercase tracking-[0.12em] text-sky-dark;
+  }
+  .driver-id-dialog__cloud {
+    @apply absolute text-white/85;
+  }
+  .driver-id-dialog__cloud--left {
+    @apply left-6 top-8 size-5;
+  }
+  .driver-id-dialog__cloud--right {
+    @apply right-11 top-9 size-5;
+  }
+  .driver-id-dialog__star {
+    @apply absolute z-10 text-sun;
+  }
+  .driver-id-dialog__star--large {
+    @apply right-24 top-6 size-5;
+  }
+  .driver-id-dialog__star--small {
+    @apply right-20 top-14 size-3;
+  }
+  .driver-id-dialog__car {
+    @apply absolute bottom-2 right-5 z-10 h-14 w-20 object-contain;
+  }
+  .driver-id-dialog__close {
+    @apply absolute shadow-sm right-4 top-4 z-20 grid size-9 place-items-center rounded-full border-0 bg-white/90 text-ink;
+  }
+  .driver-id-dialog__content {
+    @apply px-7 pb-16 pt-0 -mt-14;
+  }
+  .driver-id-dialog__identity {
+    @apply relative z-10 -mt-7 text-center;
+  }
+  .driver-id-dialog__photo {
+    @apply mx-auto rounded-2xl shadow-md flex size-28 items-center justify-center overflow-hidden bg-leaf-soft font-display text-2xl font-bold text-leaf-dark;
+  }
+  .driver-id-dialog__photo img {
+    @apply size-full object-cover p-1 bg-white rounded-2xl;
+  }
+  .driver-id-dialog__name {
+    @apply mt-3 font-display text-2xl font-bold leading-7 text-ink;
+  }
+  .driver-id-dialog__status {
+    @apply mx-auto mt-2 inline-flex items-center gap-1.5 rounded-full bg-leaf-soft px-3 py-1 text-xs font-extrabold text-leaf-dark;
+  }
+  .driver-id-dialog__status span {
+    @apply size-1.5 rounded-full bg-leaf;
+  }
+  .driver-id-dialog__details {
+    @apply mt-7 grid text-left;
+  }
+  .driver-id-dialog__details > div {
+    @apply grid grid-cols-[8.25rem_minmax(0,1fr)] gap-3 border-b border-line py-3;
+  }
+  .driver-id-dialog__details dt {
+    @apply flex items-center gap-2 text-xs font-extrabold uppercase text-muted;
+  }
+  .driver-id-dialog__details dt svg {
+    @apply size-4 shrink-0 text-leaf-dark;
+  }
+  .driver-id-dialog__details dd {
+    @apply min-w-0 break-words text-sm leading-5 text-ink;
+  }
+  .driver-id-dialog__footer {
+    @apply absolute inset-x-0 bottom-0 flex h-10 items-center justify-between bg-[#fff6d8] px-6 text-[0.65rem] font-extrabold uppercase tracking-wide text-[#ad8a31];
   }
   .status-pill {
     @apply inline-flex items-center rounded-full px-3 py-1 text-sm font-extrabold;

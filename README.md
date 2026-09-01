@@ -53,6 +53,8 @@ cp client/.env.example client/.env
 
 Set a strong `JWT_SECRET` in `server/.env`. Never commit real secrets.
 
+Set `TRUST_PROXY=true` only when the production API sits behind a trusted reverse proxy that supplies client IP headers. Keep it `false` for local development.
+
 Set `PASSWORD_RESET_ACCESS_TOKEN` to a cryptographically random value of at least 32 characters. The temporary support reset link is `${CLIENT_URL}/reset-password#token=<PASSWORD_RESET_ACCESS_TOKEN>`; distribute it privately and rotate the token immediately if it is exposed. The fragment keeps the token out of the initial server request and its access logs.
 
 Client `VITE_*` variables are bundled into frontend code and must be treated as public. Do not put backend secrets in `client/.env`.
@@ -105,6 +107,7 @@ npm run migrate
 npm run typecheck
 npm run lint
 npm run build
+npm run test
 ```
 
 ## Registration And Onboarding Flow

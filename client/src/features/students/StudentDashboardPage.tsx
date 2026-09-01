@@ -1,5 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ContactRound, Map, Phone, UserRound, X } from 'lucide-react';
+import {
+  Car,
+  Cloud,
+  ContactRound,
+  Hash,
+  Map,
+  MapPin,
+  Phone,
+  Star,
+  UserRound,
+  X,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../app/providers/useAuth';
 import { ErrorDialog } from '../../components/ui/ErrorDialog';
@@ -13,9 +24,19 @@ import StudentRideProgress from './components/StudentRideProgress';
 import { formatLocationAge } from './location-time';
 import { studentsApi } from './students.api';
 import type { AssignedDriver, StudentProfile } from './students.api';
+import schoolCar from '../../assets/school-car.svg';
 
 const STUDENT_LOCATION_POLL_INTERVAL_MS = 30_000;
 const STUDENT_STATUS_POLL_INTERVAL_MS = 20_000;
+
+const initialsFor = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase();
 
 export const StudentDashboardPage = () => {
   const mapDialogRef = useRef<HTMLDialogElement>(null);
@@ -50,7 +71,9 @@ export const StudentDashboardPage = () => {
       const { profile: savedStudentProfile } = await studentsApi.getMe(token);
       setStudentProfile(savedStudentProfile);
     } catch (caughtError) {
-      setProfileError(caughtError instanceof ApiError ? caughtError.message : 'Unable to load ride status.');
+      setProfileError(
+        caughtError instanceof ApiError ? caughtError.message : 'Unable to load ride status.',
+      );
     } finally {
       setIsLoadingProfile(false);
     }
@@ -114,7 +137,9 @@ export const StudentDashboardPage = () => {
       setDriver(assignedDriver);
     } catch (caughtError) {
       setDriver(null);
-      setDriverError(caughtError instanceof ApiError ? caughtError.message : 'Unable to load driver details.');
+      setDriverError(
+        caughtError instanceof ApiError ? caughtError.message : 'Unable to load driver details.',
+      );
     } finally {
       setIsLoadingDriver(false);
     }
@@ -133,9 +158,13 @@ export const StudentDashboardPage = () => {
     try {
       const { location } = await trackingApi.getMyDriverLatestLocation(token);
       setDriverLocation(location);
-      setMapStatus(location ? formatLocationAge(location.recordedAt) : 'Waiting for the driver location.');
+      setMapStatus(
+        location ? formatLocationAge(location.recordedAt) : 'Waiting for the driver location.',
+      );
     } catch (caughtError) {
-      setMapStatus(caughtError instanceof ApiError ? caughtError.message : 'Unable to load the live route.');
+      setMapStatus(
+        caughtError instanceof ApiError ? caughtError.message : 'Unable to load the live route.',
+      );
     }
   }, [token]);
 
@@ -205,9 +234,6 @@ export const StudentDashboardPage = () => {
 
   return (
     <section aria-labelledby="student-dashboard-heading">
-      <h1 id="student-dashboard-heading" className="sr-only">
-        Student Dashboard
-      </h1>
       <StudentHeader name={studentProfile.studentFullName ?? 'Student'} status={headerStatus} />
 
       <StudentRideProgress
@@ -290,7 +316,7 @@ export const StudentDashboardPage = () => {
         </div>
         <div className="p-5">
           <p className="font-display text-xl font-bold">
-            {(studentProfile.tripOrigin === "HOME")? "On the way to school" : "Heading home"}
+            {studentProfile.tripOrigin === 'HOME' ? 'On the way to school' : 'Heading home'}
           </p>
           <p className="body-copy">{mapStatus}</p>
         </div>
@@ -299,22 +325,40 @@ export const StudentDashboardPage = () => {
       <dialog
         ref={driverDialogRef}
         aria-labelledby="driver-details-heading"
-        className="ui-dialog"
+        className="ui-dialog driver-id-dialog"
       >
-        <div className="flex items-center justify-between border-b-2 border-line p-5">
-          <h2 id="driver-details-heading" className="section-heading">
-            Your driver
-          </h2>
-          <button
-            className="size-11 rounded-full bg-white text-xl font-bold"
-            type="button"
-            aria-label="Close driver details"
-            onClick={() => driverDialogRef.current?.close()}
-          >
-            <X className="mx-auto size-5" aria-hidden="true" strokeWidth={3} />
-          </button>
+        <h2 id="driver-details-heading" className="sr-only">
+          Driver details
+        </h2>
+        <div className="driver-id-dialog__header" aria-hidden="true">
+          <span className="driver-id-dialog__header-label">Driver's Details</span>
+          <Cloud
+            className="driver-id-dialog__cloud driver-id-dialog__cloud--left"
+            fill="currentColor"
+          />
+          <Cloud
+            className="driver-id-dialog__cloud driver-id-dialog__cloud--right"
+            fill="currentColor"
+          />
+          <Star
+            className="driver-id-dialog__star driver-id-dialog__star--large"
+            fill="currentColor"
+          />
+          <Star
+            className="driver-id-dialog__star driver-id-dialog__star--small"
+            fill="currentColor"
+          />
+          <img className="driver-id-dialog__car" src={schoolCar} alt="" />
         </div>
-        <div className="px-5 py-7">
+        <button
+          className="driver-id-dialog__close"
+          type="button"
+          aria-label="Close driver details"
+          onClick={() => driverDialogRef.current?.close()}
+        >
+          <X className="size-6" aria-hidden="true" strokeWidth={3} />
+        </button>
+        <div className="driver-id-dialog__content">
           <LoadingOverlay
             isOpen={isLoadingDriver}
             message="Loading driver details..."
@@ -332,37 +376,65 @@ export const StudentDashboardPage = () => {
 
           {driverError ? (
             <div className="grid gap-4">
-              <button className="ui-button-secondary" type="button" onClick={() => void loadAssignedDriver()}>
+              <button
+                className="ui-button-secondary"
+                type="button"
+                onClick={() => void loadAssignedDriver()}
+              >
                 Try again
               </button>
             </div>
           ) : null}
 
           {driver && !isLoadingDriver ? (
-            <dl className="grid gap-4">
-              <div>
-                <dt className="ui-label">Name</dt>
-                <dd className="body-copy">{driver.name}</dd>
+            <div className="driver-id-dialog__identity">
+              <div
+                className="driver-id-dialog__photo"
+                aria-hidden={driver.profilePhotoUrl ? undefined : 'true'}
+              >
+                {driver.profilePhotoUrl ? (
+                  <img src={driver.profilePhotoUrl} alt={`${driver.name}'s profile`} />
+                ) : (
+                  initialsFor(driver.name)
+                )}
               </div>
-              <div>
-                <dt className="ui-label">Address</dt>
-                <dd className="body-copy">{driver.address ?? 'Not available'}</dd>
-              </div>
-              <div>
-                <dt className="ui-label">Contact number</dt>
-                <dd className="body-copy">{driver.contactNumber}</dd>
-              </div>
-              <div>
-                <dt className="ui-label">Vehicle type</dt>
-                <dd className="body-copy">{driver.vehicleType ?? 'Not available'}</dd>
-              </div>
-              <div>
-                <dt className="ui-label">Vehicle plate number</dt>
-                <dd className="body-copy">{driver.vehiclePlateNumber ?? 'Not available'}</dd>
-              </div>
-            </dl>
+              <h3 className="driver-id-dialog__name">{driver.name}</h3>
+              <p className="driver-id-dialog__status">
+                <span aria-hidden="true" /> Assigned driver
+              </p>
+              <dl className="driver-id-dialog__details">
+                <div>
+                  <dt>
+                    <Car aria-hidden="true" strokeWidth={2.5} /> Vehicle type
+                  </dt>
+                  <dd>{driver.vehicleType ?? 'Not available'}</dd>
+                </div>
+                <div>
+                  <dt>
+                    <Hash aria-hidden="true" strokeWidth={2.5} /> Plate number
+                  </dt>
+                  <dd>{driver.vehiclePlateNumber ?? 'Not available'}</dd>
+                </div>
+                <div>
+                  <dt>
+                    <Phone aria-hidden="true" strokeWidth={2.5} /> Contact number
+                  </dt>
+                  <dd>{driver.contactNumber}</dd>
+                </div>
+                <div>
+                  <dt>
+                    <MapPin aria-hidden="true" strokeWidth={2.5} /> Address
+                  </dt>
+                  <dd>{driver.address ?? 'Not available'}</dd>
+                </div>
+              </dl>
+            </div>
           ) : null}
         </div>
+        <footer className="driver-id-dialog__footer">
+          <span>Driver ID</span>
+          <span>Student carlift</span>
+        </footer>
       </dialog>
     </section>
   );

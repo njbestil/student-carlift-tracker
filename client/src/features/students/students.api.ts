@@ -24,6 +24,7 @@ export type StudentProfile = StudentProfilePayload & {
 
 export type AssignedDriver = {
   name: string;
+  profilePhotoUrl: string | null;
   address: string | null;
   contactNumber: string;
   vehicleType: string | null;

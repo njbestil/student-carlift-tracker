@@ -1,5 +1,4 @@
 import { AppError } from '../../utils/app-error.js';
-import { studentDriverAssignmentsRepository } from '../student-driver-assignments/student-driver-assignments.repository.js';
 import { driversService } from '../drivers/drivers.service.js';
 import { studentsRepository } from './students.repository.js';
 import type { ServiceStatusUpdateInput, UpsertStudentProfileInput } from './students.schema.js';
@@ -28,9 +27,15 @@ export const studentsService = {
       throw new AppError('Only student accounts can update student profiles', 403);
     }
 
-    const profile = await studentsRepository.upsert(userId, input);
-    await studentsRepository.markProfileCompleted(userId);
-    await studentDriverAssignmentsRepository.assignStudentToStaticDriver(userId);
+    const profile = await studentsRepository.upsertAndCompleteWithStaticDriver(userId, input);
+
+    if (!profile) {
+      throw new AppError(
+        'A configured driver is required before student profiles can be completed',
+        409,
+      );
+    }
+
     return profile;
   },
 

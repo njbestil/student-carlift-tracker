@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import rateLimit from 'express-rate-limit';
 import { validateBody } from '../../middleware/validate-request.js';
 import { asyncHandler } from '../../utils/async-handler.js';
 import { authController } from './auth.controller.js';
@@ -10,6 +11,15 @@ import {
 } from './auth.schema.js';
 
 export const authRouter = Router();
+
+authRouter.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 10,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+  }),
+);
 
 authRouter.post('/register', validateBody(registerSchema), asyncHandler(authController.register));
 authRouter.post('/login', validateBody(loginSchema), asyncHandler(authController.login));

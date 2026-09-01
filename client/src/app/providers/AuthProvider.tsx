@@ -3,13 +3,21 @@ import type { PropsWithChildren } from 'react';
 import type { AuthenticatedUser } from '../../services/api/apiTypes';
 import { AuthContext } from './authContext';
 import type { AuthContextValue } from './authContext';
+import { parseStoredUser } from './authSession';
 
 const userStorageKey = 'student-carlift-user';
 const tokenStorageKey = 'student-carlift-token';
 
 const readStoredUser = () => {
   const storedUser = localStorage.getItem(userStorageKey);
-  return storedUser ? (JSON.parse(storedUser) as AuthenticatedUser) : null;
+  const user = parseStoredUser(storedUser);
+
+  if (!user && storedUser) {
+    localStorage.removeItem(userStorageKey);
+    localStorage.removeItem(tokenStorageKey);
+  }
+
+  return user;
 };
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {

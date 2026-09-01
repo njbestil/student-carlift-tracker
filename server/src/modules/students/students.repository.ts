@@ -20,6 +20,7 @@ export type StudentProfile = {
 
 export type AssignedDriverDetails = {
   name: string;
+  profilePhotoUrl: string | null;
   address: string | null;
   contactNumber: string;
   vehicleType: string | null;
@@ -28,6 +29,7 @@ export type AssignedDriverDetails = {
 
 type AssignedDriverDetailsRow = {
   full_name: string;
+  profile_photo_url: string | null;
   address: string | null;
   mobile_number: string;
   vehicle_type: string | null;
@@ -68,6 +70,7 @@ const mapStudentProfile = (row: StudentProfileRow): StudentProfile => ({
 
 const mapAssignedDriverDetails = (row: AssignedDriverDetailsRow): AssignedDriverDetails => ({
   name: row.full_name,
+  profilePhotoUrl: row.profile_photo_url,
   address: row.address,
   contactNumber: row.mobile_number,
   vehicleType: row.vehicle_type,
@@ -82,6 +85,7 @@ export const studentsRepository = {
   async findAssignedDriverDetails(studentUserId: string): Promise<AssignedDriverDetails | null> {
     const result = await pool.query<AssignedDriverDetailsRow>(
       `SELECT driver_profile.full_name,
+              driver_profile.profile_photo_url,
               driver_profile.address,
               driver_user.mobile_number,
               driver_profile.vehicle_type,
@@ -109,9 +113,16 @@ export const studentsRepository = {
     return result.rows[0] ? mapStudentProfile(result.rows[0]) : null;
   },
 
-  async upsert(userId: string, input: UpsertStudentProfileInput): Promise<StudentProfile> {
-    const result = await pool.query<StudentProfileRow>(
-      `INSERT INTO student_profiles (
+  async upsertAndCompleteWithStaticDriver(
+    userId: string,
+    input: UpsertStudentProfileInput,
+  ): Promise<StudentProfile | null> {
+    const client = await pool.connect();
+
+    try {
+      await client.query('BEGIN');
+      const result = await client.query<StudentProfileRow>(
+        `INSERT INTO student_profiles (
          user_id,
          student_full_name,
          parent_full_name,
@@ -132,23 +143,52 @@ export const studentsRepository = {
            longitude = CASE WHEN $8::numeric IS NULL THEN student_profiles.longitude ELSE EXCLUDED.longitude END,
            updated_at = now()
        RETURNING ${studentProfileFields}`,
-      [
-        userId,
-        input.studentFullName,
-        input.parentFullName,
-        input.completeAddress,
-        input.emergencyNumber,
-        input.profilePhotoUrl ?? '',
-        input.latitude ?? null,
-        input.longitude ?? null,
-      ],
-    );
+        [
+          userId,
+          input.studentFullName,
+          input.parentFullName,
+          input.completeAddress,
+          input.emergencyNumber,
+          input.profilePhotoUrl ?? '',
+          input.latitude ?? null,
+          input.longitude ?? null,
+        ],
+      );
 
-    return mapStudentProfile(result.rows[0]);
+      const assignment = await client.query(
+        `INSERT INTO student_driver_assignments (student_user_id, driver_user_id)
+         SELECT $1, driver_profile.user_id
+         FROM driver_profiles AS driver_profile
+         INNER JOIN users AS driver_user ON driver_user.id = driver_profile.user_id
+         WHERE driver_user.role = 'DRIVER'
+           AND driver_user.is_active = true
+         ORDER BY driver_user.created_at ASC, driver_user.id ASC
+         LIMIT 1
+         ON CONFLICT (student_user_id) DO UPDATE
+         SET driver_user_id = EXCLUDED.driver_user_id,
+             assigned_at = now(),
+             updated_at = now()
+         RETURNING student_user_id`,
+        [userId],
+      );
+
+      if (!assignment.rows[0]) {
+        await client.query('ROLLBACK');
+        return null;
+      }
+
+      await client.query(
+        'UPDATE users SET profile_completed = true, updated_at = now() WHERE id = $1',
+        [userId],
+      );
+      await client.query('COMMIT');
+
+      return mapStudentProfile(result.rows[0]);
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   },
-
-  async markProfileCompleted(userId: string): Promise<void> {
-    await pool.query('UPDATE users SET profile_completed = true, updated_at = now() WHERE id = $1', [userId]);
-  },
-
 };

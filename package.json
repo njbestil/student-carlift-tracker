@@ -13,14 +13,18 @@
     "build": "npm run build --workspaces",
     "typecheck": "npm run typecheck --workspaces",
     "lint": "npm run lint --workspaces",
+    "test": "vitest run",
     "format": "prettier --write .",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "migrate": "npm run migrate --workspace server"
   },
   "devDependencies": {
+    "@testing-library/react": "^16.3.3",
     "concurrently": "^10.0.5",
-    "prettier": "^3.6.2"
+    "jsdom": "^30.0.1",
+    "prettier": "^3.6.2",
+    "vitest": "^4.1.11"
   },
   "dependencies": {
     "clsx": "^2.1.1"
