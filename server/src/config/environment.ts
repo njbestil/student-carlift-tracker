@@ -16,6 +16,8 @@ const environmentSchema = z.object({
   PASSWORD_RESET_ACCESS_TOKEN: z
     .string()
     .min(32, 'PASSWORD_RESET_ACCESS_TOKEN must be at least 32 characters long'),
+  INITIAL_DRIVER_PASSWORD: z.string().min(8, 'INITIAL_DRIVER_PASSWORD must be at least 8 characters long').optional(),
+  INITIAL_DRIVER_FULL_NAME: z.string().trim().min(1).default('Initial Driver'),
 });
 
 const parsedEnvironment = environmentSchema.safeParse(process.env);
