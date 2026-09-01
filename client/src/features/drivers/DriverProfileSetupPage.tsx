@@ -21,6 +21,8 @@ export const DriverProfileSetupPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (values: DriverProfilePayload) => {
+    if (isSubmitting) return;
+
     setError('');
 
     if (!token || !user) {

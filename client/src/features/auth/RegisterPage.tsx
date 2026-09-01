@@ -2,6 +2,7 @@ import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../app/providers/useAuth';
 import { AuthScaffold } from '../../components/ui/AuthScaffold';
+import { LoadingButton } from '../../components/ui/LoadingButton';
 import { ToastNotification } from '../../components/ui/ToastNotification';
 import { ApiError } from '../../services/api/apiError';
 import { authApi } from './auth.api';
@@ -11,10 +12,14 @@ export const RegisterPage = () => {
   const navigate = useNavigate();
   const { setSession } = useAuth();
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSubmitting) return;
+
     setError('');
+    setIsSubmitting(true);
     const formData = new FormData(event.currentTarget);
 
     try {
@@ -28,6 +33,8 @@ export const RegisterPage = () => {
       navigate('/student/profile/setup', { replace: true });
     } catch (caughtError) {
       setError(caughtError instanceof ApiError ? caughtError.message : 'Registration failed');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -86,9 +93,9 @@ export const RegisterPage = () => {
             minLength={8}
           />
         </div>
-        <button className="ui-button-success" type="submit">
+        <LoadingButton className="ui-button-success" type="submit" isLoading={isSubmitting} loadingLabel="Creating account...">
           Create Account
-        </button>
+        </LoadingButton>
       </form>
       <p className="mt-7 text-center text-sm text-muted">
         Already registered?{' '}

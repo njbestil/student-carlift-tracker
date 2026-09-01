@@ -1,6 +1,8 @@
 import { ChevronDown, MapPin } from 'lucide-react';
 import { useId, useState } from 'react';
 import { PhoneCallAction } from '../../../components/ui/PhoneNumberWithCallButton';
+import { LoadingButton } from '../../../components/ui/LoadingButton';
+import { useDelayedLoadingIndicator } from '../../../hooks/useDelayedLoadingIndicator';
 import type { AssignedStudent, StudentServiceStatus } from '../drivers.api';
 
 type AssignedStudentCardProps = {
@@ -37,6 +39,7 @@ export const AssignedStudentCard = ({
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const detailsId = useId();
   const isAbsent = student.serviceStatus === 'ABSENT';
+  const isSpinnerVisible = useDelayedLoadingIndicator(isUpdating);
   const canChangeAttendance = student.serviceStatus === 'WAITING' || isAbsent;
   const badgeClass =
     student.serviceStatus === 'PICKED_UP'
@@ -114,11 +117,11 @@ export const AssignedStudentCard = ({
         className={`student-presence-indicator ${isUpdating || !isTripActive || !canChangeAttendance ? 'opacity-60' : ''}`}
         type="button"
         aria-pressed={isAbsent ? 'false' : 'true'}
-        aria-disabled={isUpdating || !isTripActive || !canChangeAttendance ? 'true' : 'false'}
+        disabled={isUpdating || !isTripActive || !canChangeAttendance}
         aria-label={`${student.studentFullName} attendance`}
         onClick={handleAbsentToggle}
       >
-        <span className="student-presence-indicator__light" aria-hidden="true" />
+        {isSpinnerVisible ? <span className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" aria-hidden="true" /> : <span className="student-presence-indicator__light" aria-hidden="true" />}
       </button>
 
       <div id={detailsId} hidden={!isDetailsOpen} className="border-t-2 border-line px-4 py-5">
@@ -162,14 +165,16 @@ export const AssignedStudentCard = ({
           <MapPin className="mr-2 size-5" aria-hidden="true" strokeWidth={2.5} /> View map
         </button>
         {primaryActionLabel ? (
-          <button
+          <LoadingButton
             className="ui-button-primary mt-3"
             type="button"
-            aria-disabled={isUpdating || !isTripActive ? 'true' : 'false'}
+            disabled={!isTripActive}
+            isLoading={isUpdating}
+            loadingLabel="Updating..."
             onClick={advanceRideStatus}
           >
             {primaryActionLabel}
-          </button>
+          </LoadingButton>
         ) : (
           <p className="mt-4 text-center text-sm font-extrabold text-leaf-dark">Completed</p>
         )}

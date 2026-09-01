@@ -1,6 +1,7 @@
 import { ChangeEvent, FormEvent, useEffect, useId, useRef, useState } from 'react';
 import { Camera, MapPin, UserRound } from 'lucide-react';
 import { GoogleMapsLocatorDialog, type LocationSelection } from '../../../components/GoogleMapsLocatorDialog';
+import { LoadingButton } from '../../../components/ui/LoadingButton';
 import { normalizeUaeMobileNumber, uaeMobileNumberPattern } from '../../../utils/uaeMobileNumber';
 import { validateProfilePhoto } from '../../../utils/profilePhoto';
 import type { StudentProfilePayload } from '../students.api';
@@ -77,7 +78,7 @@ export const StudentProfileForm = ({
         <div className="flex size-24 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-blush-soft text-ink shadow-[0_6px_0_#e6eef7]">
           {values.profilePhotoUrl ? <img className="size-full object-cover" src={values.profilePhotoUrl} alt="Student profile" /> : <UserRound className="size-11" strokeWidth={2.5} />}
         </div>
-        <input ref={fileInputRef} id={photoInputId} className="sr-only" type="file" accept="image/png,image/jpeg,image/webp" capture="user" onChange={(event) => void handlePhotoChange(event)} />
+        <input ref={fileInputRef} id={photoInputId} className="sr-only" type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => void handlePhotoChange(event)} />
         <button className="ui-button-secondary min-h-0 w-auto px-5 py-2 text-base" type="button" onClick={() => fileInputRef.current?.click()}>
           <Camera className="mr-2 size-5" aria-hidden="true" strokeWidth={2.5} />
           Change Photo
@@ -111,9 +112,9 @@ export const StudentProfileForm = ({
           <label className="ui-label" htmlFor="emergencyNumber">Emergency Mobile Number</label>
           <input className="ui-field" id="emergencyNumber" name="emergencyNumber" value={values.emergencyNumber} onChange={(event) => updateValue('emergencyNumber', normalizeUaeMobileNumber(event.target.value))} autoComplete="tel" inputMode="tel" pattern={uaeMobileNumberPattern} maxLength={10} placeholder="0501234567" required />
         </div>
-        <button className="ui-button-primary" type="submit" aria-disabled={isSubmitting ? 'true' : 'false'}>
-          {isSubmitting ? 'Saving...' : submitLabel}
-        </button>
+        <LoadingButton className="ui-button-primary" type="submit" isLoading={isSubmitting} loadingLabel="Saving...">
+          {submitLabel}
+        </LoadingButton>
       </form>
 
       <GoogleMapsLocatorDialog

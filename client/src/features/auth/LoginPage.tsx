@@ -1,8 +1,8 @@
 import { FormEvent, useState } from 'react';
-import { LoaderCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../app/providers/useAuth';
 import { AuthScaffold } from '../../components/ui/AuthScaffold';
+import { LoadingButton } from '../../components/ui/LoadingButton';
 import { ToastNotification } from '../../components/ui/ToastNotification';
 import { ApiError } from '../../services/api/apiError';
 import { authApi } from './auth.api';
@@ -107,14 +107,14 @@ export const LoginPage = () => {
         >
           Forgot Password?
         </Link>
-        <button
+        <LoadingButton
           className="ui-button-primary disabled:cursor-wait disabled:opacity-70 disabled:shadow-[0_4px_0_#3f7fdc]"
           type="submit"
-          disabled={isSubmitting}
+          isLoading={isSubmitting}
+          loadingLabel="Logging in..."
         >
-          {isSubmitting ? <LoaderCircle className="mr-2 size-5 animate-spin" aria-hidden="true" strokeWidth={3} /> : null}
-          {isSubmitting ? 'Logging in...' : 'Log In'}
-        </button>
+          Log In
+        </LoadingButton>
       </form>
       <p className="mt-7 text-center text-sm text-muted">new here?</p>
       <Link className="ui-button-secondary mt-3" to="/register">

@@ -6,7 +6,7 @@ type LoadingOverlayProps = {
   isOpen: boolean;
   message?: string;
   fallbackLabel?: string;
-  onFallback: () => void;
+  onFallback?: () => void;
   showDelayMs?: number;
   minimumVisibleMs?: number;
 };
@@ -14,7 +14,7 @@ type LoadingOverlayProps = {
 export const LoadingOverlay = ({
   isOpen,
   message = 'Loading...',
-  fallbackLabel = 'Close',
+  fallbackLabel,
   onFallback,
   showDelayMs = 250,
   minimumVisibleMs = 300,
@@ -84,9 +84,11 @@ export const LoadingOverlay = ({
         <p className="font-display text-xl font-bold text-ink" role="status">
           {message}
         </p>
-        <button className="ui-button-secondary" type="button" onClick={onFallback}>
-          {fallbackLabel}
-        </button>
+        {onFallback && fallbackLabel ? (
+          <button className="ui-button-secondary" type="button" onClick={onFallback}>
+            {fallbackLabel}
+          </button>
+        ) : null}
       </div>
     </div>,
     document.body,

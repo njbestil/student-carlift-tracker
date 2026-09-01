@@ -128,14 +128,14 @@ export const DriverDashboardPage = () => {
           <h1 id="driver-dashboard-heading" className="display-heading">Hi, {driverName? driverName.split(" ")[0] : 'Driver'}!</h1>
           <p className="body-copy">{onBoardCount} {onBoardCount === 1 ? 'student' : 'students'} on board &middot; {students.length} total</p>
         </div>
-        <DriverRideStatusCard isOnService={onService} isUpdating={isUpdatingService} locationMessage={locationPublisher.message} onToggle={() => void toggleService()} />
+        <DriverRideStatusCard isOnService={onService} isUpdating={isUpdatingService} locationMessage={locationPublisher.message} onToggle={toggleService} />
         <DriverTripCard
           activeTrip={dashboard.activeTrip}
           students={students}
           isStarting={isStartingTrip}
           isCancelling={isCancellingTrip}
-          onStart={(tripOrigin) => void startTrip(tripOrigin)}
-          onCancel={() => void cancelActiveTrip()}
+          onStart={startTrip}
+          onCancel={cancelActiveTrip}
         />
         <h2 className="section-heading mb-4">Today's Riders</h2>
         {students.length ? <div className="grid gap-4">
