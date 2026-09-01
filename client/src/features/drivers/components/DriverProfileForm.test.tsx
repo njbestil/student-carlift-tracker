@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { DriverProfileForm } from './DriverProfileForm';
 
@@ -18,8 +18,12 @@ describe('DriverProfileForm', () => {
       />,
     );
 
-    const photoInput = container.querySelector('input[type="file"]');
-    expect(photoInput?.getAttribute('accept')).toBe('image/png,image/jpeg,image/webp');
-    expect(photoInput?.hasAttribute('capture')).toBe(false);
+    const photoInputs = container.querySelectorAll('input[type="file"]');
+    expect(photoInputs).toHaveLength(2);
+    expect(photoInputs[0]?.getAttribute('accept')).toBe('image/png,image/jpeg,image/webp');
+    expect(photoInputs[0]?.hasAttribute('capture')).toBe(false);
+    expect(photoInputs[1]?.getAttribute('capture')).toBe('user');
+    expect(screen.getByRole('button', { name: 'Upload from gallery' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Take a photo' })).toBeTruthy();
   });
 });

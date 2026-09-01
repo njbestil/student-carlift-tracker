@@ -1,8 +1,8 @@
-import { type ChangeEvent, type FormEvent, useEffect, useId, useRef, useState } from 'react';
-import { Camera, MapPin, UserRound } from 'lucide-react';
+import { type FormEvent, useEffect, useState } from 'react';
+import { MapPin, UserRound } from 'lucide-react';
 import { GoogleMapsLocatorDialog, type LocationSelection } from '../../../components/GoogleMapsLocatorDialog';
 import { LoadingButton } from '../../../components/ui/LoadingButton';
-import { validateProfilePhoto } from '../../../utils/profilePhoto';
+import { ProfilePhotoPicker } from '../../../components/ui/ProfilePhotoPicker';
 import type { DriverProfilePayload } from '../drivers.api';
 
 type DriverProfileFormValues = DriverProfilePayload & { contactNumber: string };
@@ -22,36 +22,11 @@ export const DriverProfileForm = ({
 }: DriverProfileFormProps) => {
   const [values, setValues] = useState<DriverProfileFormValues>(initialValues);
   const [isLocatorOpen, setIsLocatorOpen] = useState(false);
-  const [photoError, setPhotoError] = useState('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const photoInputId = useId();
 
   useEffect(() => setValues(initialValues), [initialValues]);
 
   const updateValue = (key: keyof DriverProfileFormValues, value: string | number) => {
     setValues((current) => ({ ...current, [key]: value }));
-  };
-
-  const handlePhotoChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    event.target.value = '';
-    if (!file) return;
-
-    const validationError = await validateProfilePhoto(file);
-    if (validationError) {
-      setPhotoError(validationError);
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        updateValue('profilePhotoUrl', reader.result);
-        setPhotoError('');
-      }
-    };
-    reader.onerror = () => setPhotoError('Unable to read that image. Try another file.');
-    reader.readAsDataURL(file);
   };
 
   const handleLocationSelect = (location: LocationSelection) => {
@@ -75,12 +50,7 @@ export const DriverProfileForm = ({
         <div className="flex size-24 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-sky-soft text-ink shadow-[0_6px_0_#e6eef7]">
           {values.profilePhotoUrl ? <img className="size-full object-cover" src={values.profilePhotoUrl} alt="Driver profile" /> : <UserRound className="size-11" strokeWidth={2.5} />}
         </div>
-        <input ref={fileInputRef} id={photoInputId} className="sr-only" type="file" accept="image/png,image/jpeg,image/webp" onChange={(event) => void handlePhotoChange(event)} />
-        <button className="ui-button-secondary min-h-0 w-auto px-5 py-2 text-base" type="button" onClick={() => fileInputRef.current?.click()}>
-          <Camera className="mr-2 size-5" aria-hidden="true" strokeWidth={2.5} />
-          Change Photo
-        </button>
-        <p className="form-error min-h-0" role="alert">{photoError}</p>
+        <ProfilePhotoPicker onPhotoChange={(photoUrl) => updateValue('profilePhotoUrl', photoUrl)} />
       </div>
 
       <form className="ui-card form-stack mt-5" onSubmit={(event) => void handleSubmit(event)}>
