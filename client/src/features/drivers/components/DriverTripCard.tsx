@@ -1,14 +1,15 @@
 import { useId, useRef, useState } from 'react';
 import type { AssignedStudent, DriverTrip } from '../drivers.api';
 import { ToastNotification } from '../../../components/ui/ToastNotification';
+import { LoadingButton } from '../../../components/ui/LoadingButton';
 
 type DriverTripCardProps = {
   activeTrip: DriverTrip | null;
   students: AssignedStudent[];
   isStarting: boolean;
   isCancelling: boolean;
-  onStart: (tripOrigin: DriverTrip['tripOrigin']) => void;
-  onCancel: () => void;
+  onStart: (tripOrigin: DriverTrip['tripOrigin']) => Promise<void>;
+  onCancel: () => Promise<void>;
 };
 
 const routeLabel = (tripOrigin: DriverTrip['tripOrigin']) => tripOrigin === 'HOME' ? 'Home → School' : 'School → Home';
@@ -32,10 +33,10 @@ export const DriverTripCard = ({ activeTrip, students, isStarting, isCancelling,
     dialogRef.current?.showModal();
   };
 
-  const confirmStart = () => {
+  const confirmStart = async () => {
     if (isStarting) return;
+    await onStart(tripOrigin);
     dialogRef.current?.close();
-    onStart(tripOrigin);
   };
 
   const openCancelConfirmation = () => {
@@ -60,7 +61,7 @@ export const DriverTripCard = ({ activeTrip, students, isStarting, isCancelling,
           <button
             className="ui-button-secondary mt-4 w-full text-[#c95f7d]"
             type="button"
-            aria-disabled={canCancel && !isCancelling ? 'false' : 'true'}
+            disabled={!canCancel || isCancelling}
             onClick={openCancelConfirmation}
           >
             {isCancelling ? 'Cancelling trip...' : 'Cancel trip'}
@@ -72,10 +73,9 @@ export const DriverTripCard = ({ activeTrip, students, isStarting, isCancelling,
             <p className="body-copy mt-2">All riders are marked absent. This trip will be recorded as cancelled.</p>
             <div className="mt-5 grid grid-cols-2 gap-3">
               <button className="ui-button-secondary" type="button" onClick={() => cancelDialogRef.current?.close()}>Keep trip</button>
-              <button className="ui-button-primary" type="button" onClick={() => {
-                cancelDialogRef.current?.close();
-                onCancel();
-              }}>Cancel trip</button>
+              <LoadingButton className="ui-button-primary" type="button" isLoading={isCancelling} loadingLabel="Cancelling trip..." onClick={() => void onCancel().then(() => cancelDialogRef.current?.close())}>
+                Cancel trip
+              </LoadingButton>
             </div>
           </div>
         </dialog>
@@ -89,8 +89,8 @@ export const DriverTripCard = ({ activeTrip, students, isStarting, isCancelling,
         <p className="text-sm font-extrabold text-sky-dark">Ready for a trip</p>
         <p className="mt-1 font-display text-xl font-bold">Choose where riders are starting.</p>
         <div className="mt-4 grid gap-3">
-          <button className="ui-button-primary" type="button" aria-disabled={isStarting ? 'true' : 'false'} onClick={() => openConfirmation('HOME')}>Start school run</button>
-          <button className="ui-button-secondary" type="button" aria-disabled={isStarting ? 'true' : 'false'} onClick={() => openConfirmation('SCHOOL')}>Start return trip</button>
+          <button className="ui-button-primary" type="button" disabled={isStarting} onClick={() => openConfirmation('HOME')}>Start school run</button>
+          <button className="ui-button-secondary" type="button" disabled={isStarting} onClick={() => openConfirmation('SCHOOL')}>Start return trip</button>
         </div>
       </div>
       <dialog ref={dialogRef} aria-labelledby={titleId} className="ui-dialog">
@@ -99,7 +99,9 @@ export const DriverTripCard = ({ activeTrip, students, isStarting, isCancelling,
           <p className="body-copy mt-2">{students.length - absentCount} students will be set to Waiting. {absentCount ? `${absentCount} absent students will remain absent.` : ''}</p>
           <div className="mt-5 grid grid-cols-2 gap-3">
             <button className="ui-button-secondary" type="button" onClick={() => dialogRef.current?.close()}>Cancel</button>
-            <button className="ui-button-primary" type="button" onClick={confirmStart}>Start trip</button>
+            <LoadingButton className="ui-button-primary" type="button" isLoading={isStarting} loadingLabel="Starting trip..." onClick={() => void confirmStart()}>
+              Start trip
+            </LoadingButton>
           </div>
         </div>
       </dialog>

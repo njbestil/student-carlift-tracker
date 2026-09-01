@@ -53,6 +53,8 @@ export const DriverProfilePage = () => {
   }, [loadProfile]);
 
   const handleSubmit = async (values: DriverProfilePayload) => {
+    if (isSubmitting) return;
+
     setError('');
     setMessage('');
 

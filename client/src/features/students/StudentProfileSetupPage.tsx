@@ -10,8 +10,11 @@ export const StudentProfileSetupPage = () => {
   const navigate = useNavigate();
   const { token, user, updateUser } = useAuth();
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (values: Parameters<typeof studentsApi.updateMe>[0]) => {
+    if (isSubmitting) return;
+
     setError('');
 
     if (!token || !user) {
@@ -19,12 +22,15 @@ export const StudentProfileSetupPage = () => {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       await studentsApi.updateMe(values, token);
       updateUser({ ...user, profileCompleted: true });
       navigate('/student/dashboard', { replace: true });
     } catch (caughtError) {
       setError(caughtError instanceof ApiError ? caughtError.message : 'Unable to save profile');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -39,6 +45,7 @@ export const StudentProfileSetupPage = () => {
       <ToastNotification message={error} variant="error" onClose={() => setError('')} />
       <StudentProfileForm
         initialValues={{ studentFullName: '', parentFullName: '', completeAddress: '', emergencyNumber: '', profilePhotoUrl: '' }}
+        isSubmitting={isSubmitting}
         onSubmit={handleSubmit}
         submitLabel="Save Profile"
       />

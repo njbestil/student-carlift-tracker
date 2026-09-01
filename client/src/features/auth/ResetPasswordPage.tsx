@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthScaffold } from '../../components/ui/AuthScaffold';
+import { LoadingButton } from '../../components/ui/LoadingButton';
 import { ToastNotification, type ToastVariant } from '../../components/ui/ToastNotification';
 import { ApiError } from '../../services/api/apiError';
 import { authApi } from './auth.api';
@@ -10,11 +11,15 @@ export const ResetPasswordPage = () => {
   const resetToken = new URLSearchParams(window.location.hash.slice(1)).get('token') ?? '';
   const [message, setMessage] = useState('');
   const [messageVariant, setMessageVariant] = useState<ToastVariant>('success');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSubmitting) return;
+
     const form = event.currentTarget;
     setMessage('');
+    setIsSubmitting(true);
     const formData = new FormData(form);
 
     try {
@@ -30,6 +35,8 @@ export const ResetPasswordPage = () => {
     } catch (caughtError) {
       setMessageVariant('error');
       setMessage(caughtError instanceof ApiError ? caughtError.message : 'Unable to reset password');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -92,9 +99,9 @@ export const ResetPasswordPage = () => {
             required
           />
         </div>
-        <button className="ui-button-success" type="submit">
+        <LoadingButton className="ui-button-success" type="submit" isLoading={isSubmitting} loadingLabel="Resetting password...">
           Reset Password
-        </button>
+        </LoadingButton>
       </form>
       <Link className="ui-button-secondary mt-7" to="/login">
         Back to Log In

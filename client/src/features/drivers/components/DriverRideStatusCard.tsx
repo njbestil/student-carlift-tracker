@@ -11,7 +11,23 @@ export const DriverRideStatusCard = ({
   locationMessage,
   onToggle,
 }: DriverRideStatusCardProps) => (
-  <div className="ui-card mb-7 flex items-center justify-between gap-4 bg-sky-soft">
+  <DriverRideStatusCardContent
+    isOnService={isOnService}
+    isUpdating={isUpdating}
+    locationMessage={locationMessage}
+    onToggle={onToggle}
+  />
+);
+
+const DriverRideStatusCardContent = ({
+  isOnService,
+  isUpdating,
+  locationMessage,
+  onToggle,
+}: DriverRideStatusCardProps) => {
+  const isSpinnerVisible = useDelayedLoadingIndicator(isUpdating);
+
+  return <div className="ui-card mb-7 flex items-center justify-between gap-4 bg-sky-soft">
     <div>
       <p className="text-sm font-extrabold text-muted">Ride Status</p>
       <p className="font-display text-xl font-bold">
@@ -22,14 +38,16 @@ export const DriverRideStatusCard = ({
     <button
       className={`relative h-12 w-24 rounded-full border-0 p-1 transition-colors ${isOnService ? 'bg-leaf' : 'bg-line'}`}
       type="button"
-      aria-disabled={isUpdating ? 'true' : 'false'}
+      disabled={isUpdating}
       aria-pressed={isOnService}
-      aria-label="On service"
+      aria-label={isUpdating ? 'Updating service status' : 'On service'}
       onClick={onToggle}
     >
-      <span
-        className={`block size-10 rounded-full bg-white shadow-md transition-transform ${isOnService ? 'translate-x-12' : 'translate-x-0'}`}
-      />
+      {isSpinnerVisible ? (
+        <LoaderCircle className="mx-auto size-6 animate-spin text-sky-dark" aria-hidden="true" strokeWidth={3} />
+      ) : <span className={`block size-10 rounded-full bg-white shadow-md transition-transform ${isOnService ? 'translate-x-12' : 'translate-x-0'}`} />}
     </button>
-  </div>
-);
+  </div>;
+};
+import { LoaderCircle } from 'lucide-react';
+import { useDelayedLoadingIndicator } from '../../../hooks/useDelayedLoadingIndicator';

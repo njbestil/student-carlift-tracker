@@ -20,6 +20,7 @@ export const StudentProfilePage = () => {
   const { token, user, updateUser } = useAuth();
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -54,6 +55,8 @@ export const StudentProfilePage = () => {
   }, [loadProfile]);
 
   const handleSubmit = async (values: Parameters<typeof studentsApi.updateMe>[0] & { mobileNumber?: string }) => {
+    if (isSubmitting) return;
+
     setError('');
     setMessage('');
 
@@ -62,6 +65,7 @@ export const StudentProfilePage = () => {
       return;
     }
 
+    setIsSubmitting(true);
     try {
       const [{ profile: savedProfile }, { user: savedUser }] = await Promise.all([
         studentsApi.updateMe(values, token),
@@ -73,6 +77,8 @@ export const StudentProfilePage = () => {
       setMessage('Profile saved successfully.');
     } catch (caughtError) {
       setError(caughtError instanceof ApiError ? caughtError.message : 'Unable to save profile');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -108,6 +114,7 @@ export const StudentProfilePage = () => {
               mobileNumber: user?.mobileNumber ?? '',
               profilePhotoUrl: values.profilePhotoUrl ?? '',
             }}
+            isSubmitting={isSubmitting}
             onSubmit={handleSubmit}
             submitLabel="Save Changes"
           />
