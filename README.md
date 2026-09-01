@@ -1,6 +1,6 @@
 # Student Carlift Tracker
 
-Initial monorepo foundation for a Student Carlift Tracker app. The current phase focuses on architecture, configuration, database setup, authentication, onboarding, and development tooling.
+Production Student Carlift Tracker application. The current release includes authentication and onboarding, driver/student profiles, assigned-driver trip management, live vehicle tracking, Google Maps-based location selection, and automated unit/component coverage.
 
 ## Architecture Overview
 
@@ -254,11 +254,18 @@ To keep free-tier usage low:
 - Student location polling runs only while the dialog is open and the tab is visible.
 - The MVP does not call Google Directions, Distance Matrix, Places, or Geocoding APIs.
 
-## Next Development Phase
+## Implemented Features
 
-- Admin-controlled driver creation and role management.
-- Per-user, one-time password reset tokens and SMS integration.
-- File upload/storage for profile photos.
-- Student-driver assignment and route planning.
-- Vehicle/location UI and Google Maps integration.
-- Automated API and UI tests.
+- **Profile photos:** students and drivers can select a photo from the gallery or take one with the device camera. Images are validated as PNG, JPEG, WebP, or GIF (up to 5 MB and 1280 px in either dimension) and stored with the profile as an image data URL.
+- **Student-driver assignment and trip management:** every student is assigned to the configured static driver. Drivers can run Home → School and School → Home trips, update only valid student pickup/drop-off transitions, and retain separate trip history for each journey.
+- **Vehicle and location experience:** driver location sharing sends throttled GPS updates while on service. Students can view only their assigned driver's latest location in the live map, and both student and driver profiles can select an address with Google Maps.
+- **Google Maps integration:** the client loads Maps only when a map or address locator is opened. It uses the Maps JavaScript and Places APIs; Directions, Distance Matrix, and Geocoding APIs are not used by the current release.
+- **Automated tests:** the repository includes Vitest unit and React component tests, run with `npm run test`.
+
+## Remaining Development Work
+
+- Admin-controlled driver creation, role management, and configurable student-driver assignments.
+- Per-user, single-use password-reset tokens with expiry and SMS delivery.
+- Server-backed object storage for profile photos, replacing database-stored image data URLs as the application grows.
+- Route-planning features beyond the current Home → School and School → Home trip workflow.
+- Broader API integration and end-to-end UI test coverage.
