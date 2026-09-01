@@ -1,4 +1,5 @@
 import { FormEvent, useState } from 'react';
+import { LoaderCircle } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../app/providers/useAuth';
 import { AuthScaffold } from '../../components/ui/AuthScaffold';
@@ -23,10 +24,14 @@ export const LoginPage = () => {
   const navigate = useNavigate();
   const { setSession } = useAuth();
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (isSubmitting) return;
+
     setError('');
+    setIsSubmitting(true);
     const formData = new FormData(event.currentTarget);
 
     try {
@@ -46,6 +51,8 @@ export const LoginPage = () => {
       );
     } catch (caughtError) {
       setError(caughtError instanceof ApiError ? caughtError.message : 'Login failed');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -100,8 +107,13 @@ export const LoginPage = () => {
         >
           Forgot Password?
         </Link>
-        <button className="ui-button-primary" type="submit">
-          Log In
+        <button
+          className="ui-button-primary disabled:cursor-wait disabled:opacity-70 disabled:shadow-[0_4px_0_#3f7fdc]"
+          type="submit"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? <LoaderCircle className="mr-2 size-5 animate-spin" aria-hidden="true" strokeWidth={3} /> : null}
+          {isSubmitting ? 'Logging in...' : 'Log In'}
         </button>
       </form>
       <p className="mt-7 text-center text-sm text-muted">new here?</p>
