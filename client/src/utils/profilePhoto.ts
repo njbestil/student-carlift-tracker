@@ -1,6 +1,6 @@
 const supportedPhotoTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
 
-export const maxProfilePhotoSizeBytes = 1024 * 1024;
+export const maxProfilePhotoSizeBytes = 5 * 1024 * 1024;
 export const maxProfilePhotoDimension = 1280;
 
 const getImageDimensions = (file: File): Promise<{ width: number; height: number }> => new Promise((resolve, reject) => {
@@ -24,7 +24,7 @@ export const validateProfilePhoto = async (file: File): Promise<string | null> =
   }
 
   if (file.size > maxProfilePhotoSizeBytes) {
-    return 'Choose an image smaller than 1 MB.';
+    return 'Choose an image smaller than 5 MB.';
   }
 
   try {
